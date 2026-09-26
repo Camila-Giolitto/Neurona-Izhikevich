@@ -95,9 +95,5 @@ Neurona-Izhikevich/
 
 ---
 
-## Autores
-
-- Camila Giolitto
-- *(completar con los compañeros de grupo)*
 
 Docentes: Francisco Tamarit, Juan Perotti, Tristán Osán, Franco Milana.
