@@ -29,7 +29,7 @@ si v ≥ v+  →  v ← v−,   u ← u + Δu
 
 Parámetros base: `g2 = 0.04`, `g1 = 5`, `g0 = 140`, `v+ = 30 mV`.
 
-> Nota: la consigna usa la notación `b, c, v−, Δu`, que corresponde a `a, b, c, d` del paper original.
+> Nota: la notación `b, c, v−, Δu`, corresponde a `a, b, c, d` del paper original.
 
 ---
 
@@ -52,7 +52,7 @@ Parámetros base: `g2 = 0.04`, `g1 = 5`, `g0 = 140`, `v+ = 30 mV`.
 | RZ | Resonator | 0.1 | 0.26 | −65 | 2 |
 | LTS | Low-threshold spiking | 0.02 | 0.25 | −65 | 2 |
 
-### Parte 2 (opcional) — Red de neuronas
+### Parte 2 — Red de neuronas
 
 - Traducción a Python del código MATLAB del paper.
 - 800 neuronas excitatorias + 200 inhibitorias con parámetros heterogéneos (`r_i ~ U[0,1]`).
@@ -82,17 +82,6 @@ Neurona-Izhikevich/
 ```
 
 ---
-
-## Cómo correrlo
-
-```bash
-git clone https://github.com/camiigiolitto-design/Neurona-Izhikevich.git
-cd Neurona-Izhikevich
-pip install -r requirements.txt
-jupyter notebook
-```
-
-También se puede abrir cada notebook directamente en Google Colab.
 
 **Dependencias:** Python 3.10+, `numpy`, `matplotlib`, `jupyter`.
 
