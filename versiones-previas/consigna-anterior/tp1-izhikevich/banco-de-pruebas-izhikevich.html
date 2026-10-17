@@ -1,0 +1,428 @@
+<title>Banco de pruebas Izhikevich</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+/* Layout: una columna de lectura (cuaderno de laboratorio) con un banco de pruebas interactivo ancho arriba. */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #17212c;
+  --muted: #5a6573;
+  --line: #d8dee6;
+  --v: #1f5fa8;      /* potencial de membrana */
+  --u: #c8650f;      /* variable de recuperación */
+  --reset: #2e8b57;  /* v- */
+  --peak: #c0392b;   /* v+ */
+  --jump: #7b4fa0;   /* Δu */
+  --chip: #e8eef5;
+  --f-display: "Literata", Georgia, serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161c; --surface: #19212a; --ink: #e3e8ee; --muted: #9aa6b3; --line: #2c3743;
+    --v: #6fa8ec; --u: #f0a45a; --reset: #5cc28a; --peak: #ef7a6d; --jump: #b593d6; --chip: #22303d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161c; --surface: #19212a; --ink: #e3e8ee; --muted: #9aa6b3; --line: #2c3743;
+  --v: #6fa8ec; --u: #f0a45a; --reset: #5cc28a; --peak: #ef7a6d; --jump: #b593d6; --chip: #22303d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 80px; display: grid; gap: 48px; }
+.read { max-width: 68ch; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 650; line-height: 1.2; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); }
+h2 { font-size: 1.55rem; }
+h3 { font-size: 1.15rem; }
+p { margin: 0; }
+.stack { display: grid; gap: 14px; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lead { font-size: 1.08rem; color: var(--muted); }
+code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
+.eq { overflow-x: auto; padding: 14px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+
+/* tabla de letras */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 0.93rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+td.sym { font-family: var(--f-mono); font-weight: 500; white-space: nowrap; }
+td.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
+
+/* banco de pruebas */
+.lab { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: grid; gap: 18px; }
+.lab-grid { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 22px; }
+@media (max-width: 760px) { .lab-grid { grid-template-columns: minmax(0, 1fr); } }
+.controls { display: grid; gap: 14px; align-content: start; }
+fieldset.cur { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px 12px; margin: 0; display: grid; gap: 10px; min-width: 0; }
+fieldset.cur legend { font-size: 0.8rem; font-family: var(--f-mono); color: var(--muted); padding: 0 4px; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.presets button { font-family: var(--f-mono); font-size: 0.82rem; padding: 5px 10px; border-radius: 4px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); cursor: pointer; }
+.presets button[aria-pressed="true"] { background: var(--v); border-color: var(--v); color: var(--surface); }
+.presets button:focus-visible, input[type=range]:focus-visible { outline: 2px solid var(--v); outline-offset: 2px; }
+.ctl { display: grid; gap: 2px; }
+.ctl label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.88rem; }
+.ctl label b { font-family: var(--f-mono); font-weight: 500; }
+.ctl label span.val { font-family: var(--f-mono); font-variant-numeric: tabular-nums; color: var(--muted); }
+.ctl small { color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
+input[type=range] { width: 100%; accent-color: var(--v); }
+.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.readout div { background: var(--chip); border-radius: 5px; padding: 8px 10px; }
+.readout dt { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--f-mono); }
+.readout dd { margin: 0; font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 0.98rem; }
+.plots { display: grid; gap: 14px; min-width: 0; align-content: start; }
+.plot { align-content: start; }
+.plot { display: grid; gap: 2px; min-width: 0; }
+.plot .cap { font-size: 0.78rem; color: var(--muted); font-family: var(--f-mono); }
+canvas { width: 100%; display: block; border-radius: 4px; }
+.note { font-size: 0.86rem; color: var(--muted); }
+
+/* secciones por letra */
+.letter { display: grid; gap: 16px; padding-top: 28px; border-top: 1px solid var(--line); }
+.letter header { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.tag { font-family: var(--f-mono); font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; background: var(--chip); color: var(--muted); }
+figure { margin: 0; display: grid; gap: 8px; }
+figure .plate { background: #ffffff; border: 1px solid var(--line); border-radius: 6px; padding: 8px; overflow-x: auto; }
+figure img { display: block; width: 100%; height: auto; min-width: 520px; }
+figcaption { font-size: 0.85rem; color: var(--muted); max-width: 75ch; }
+.look { border-left: 3px solid var(--line); padding-left: 14px; display: grid; gap: 6px; }
+.look strong { font-size: 0.8rem; font-family: var(--f-mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.cv { color: var(--v); } .cu { color: var(--u); } .cr { color: var(--reset); } .cp { color: var(--peak); } .cj { color: var(--jump); }
+footer { font-size: 0.85rem; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+<header class="stack read">
+  <span class="eyebrow">TP1 · Redes Neuronales 2026 · Modelo de Izhikevich</span>
+  <h1>Banco de pruebas Izhikevich</h1>
+  <p class="lead">Ecuaciones, parámetros, los ocho tipos de disparo de la Figura 2 y un simulador para probarlos.</p>
+</header>
+
+<section class="stack">
+  <div class="stack read">
+    <h2>Ecuaciones y parámetros</h2>
+    <p>Usamos la notación del TP. El paper de Izhikevich (2003) llama distinto a los parámetros, y la tabla tiene las dos columnas para que no se mezclen.</p>
+  </div>
+  <div class="eq">
+    \[
+    \dot v = \underbrace{g_2 v^2 + g_1 v + g_0}_{\text{dinámica rápida de la membrana}} \;-\; \underbrace{u}_{\text{freno}} \;+\; \underbrace{I(t)}_{\text{entrada}},
+    \qquad
+    \dot u = b\,(c\,v - u),
+    \qquad
+    \text{si } v \ge v_+:\; v \leftarrow v_-,\; u \leftarrow u + \Delta u .
+    \]
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>TP</th><th>Paper</th><th>Qué es</th><th>Unidad / escala</th><th>Valor típico</th></tr></thead>
+      <tbody>
+        <tr><td class="sym"><span class="sw" style="background:var(--v)"></span>v</td><td class="sym">v</td><td>Potencial de membrana. Es la variable rápida: sube durante el spike en ~1 ms.</td><td class="num">mV</td><td class="num">reposo −70</td></tr>
+        <tr><td class="sym"><span class="sw" style="background:var(--u)"></span>u</td><td class="sym">u</td><td>Variable de recuperación. Resume la activación de K⁺ y la inactivación de Na⁺: es lenta y frena a v.</td><td class="num">mV/ms (misma que v̇)</td><td class="num">reposo c·v* = −14</td></tr>
+        <tr><td class="sym">I(t)</td><td class="sym">I</td><td>Corriente de entrada (inyectada o sináptica). Empuja a v hacia arriba.</td><td class="num">mV/ms</td><td class="num">0 a 20</td></tr>
+        <tr><td class="sym">g₂, g₁, g₀</td><td class="sym">0.04, 5, 140</td><td>Coeficientes de la parábola. Fijan las unidades (mV, ms) y dónde están reposo y umbral.</td><td class="num">—</td><td class="num">0.04, 5, 140</td></tr>
+        <tr><td class="sym">b</td><td class="sym">a</td><td>Escala temporal de u. 1/b es el tiempo que tarda u en relajarse.</td><td class="num">1/ms</td><td class="num">0.02 (50 ms) a 0.1 (10 ms)</td></tr>
+        <tr><td class="sym">c</td><td class="sym">b</td><td>Sensibilidad de u a v por debajo del umbral. Es la pendiente de la nulclina de u.</td><td class="num">adimensional</td><td class="num">0.2 a 0.26</td></tr>
+        <tr><td class="sym"><span class="sw" style="background:var(--peak)"></span>v₊</td><td class="sym">30</td><td>Pico del spike: al cruzarlo se cuenta un disparo y se aplica el reseteo.</td><td class="num">mV</td><td class="num">30</td></tr>
+        <tr><td class="sym"><span class="sw" style="background:var(--reset)"></span>v₋</td><td class="sym">c</td><td>Potencial de reseteo: a dónde vuelve v después del spike.</td><td class="num">mV</td><td class="num">−65 a −50</td></tr>
+        <tr><td class="sym"><span class="sw" style="background:var(--jump)"></span>Δu</td><td class="sym">d</td><td>Salto de u en cada spike: cuánta “fatiga” deja cada disparo.</td><td class="num">mV/ms</td><td class="num">0.05 a 8</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="stack" aria-labelledby="tipos-h">
+  <div class="stack read">
+    <h2 id="tipos-h">Los 8 tipos de disparo</h2>
+    <p>Los casos de la Figura 2 del paper, con los parámetros en notación del TP y la corriente que usamos (de la guía 6). Cada fila se carga en el banco de pruebas con su botón.</p>
+  </div>
+  <div class="tbl-wrap">
+    <table class="tipos">
+      <thead><tr><th>Botón</th><th>Tipo</th><th>b</th><th>c</th><th>v₋</th><th>Δu</th><th>Corriente</th><th>Spikes en 200 ms</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">RS</td><td>Regular spiking</td><td class="num">0.02</td><td class="num">0.2</td><td class="num">−65</td><td class="num">8</td><td>I₁: 0 → 10 en t = 25 ms</td><td class="num">5</td></tr>
+        <tr><td class="sym">IB</td><td>Intrinsically bursting</td><td class="num">0.02</td><td class="num">0.2</td><td class="num">−55</td><td class="num">4</td><td>I₁</td><td class="num">8</td></tr>
+        <tr><td class="sym">CH</td><td>Chattering</td><td class="num">0.02</td><td class="num">0.2</td><td class="num">−50</td><td class="num">2</td><td>I₁</td><td class="num">18</td></tr>
+        <tr><td class="sym">FS</td><td>Fast spiking</td><td class="num">0.1</td><td class="num">0.2</td><td class="num">−65</td><td class="num">2</td><td>I₁</td><td class="num">24</td></tr>
+        <tr><td class="sym">LTS</td><td>Low-threshold spiking</td><td class="num">0.02</td><td class="num">0.25</td><td class="num">−65</td><td class="num">2</td><td>I₁</td><td class="num">16</td></tr>
+        <tr><td class="sym">TC</td><td>Thalamo-cortical, despolarizado</td><td class="num">0.02</td><td class="num">0.25</td><td class="num">−65</td><td class="num">0.05</td><td>I₂: 0 → 2.5 en t = 150 ms</td><td class="num">5</td></tr>
+        <tr><td class="sym">TC rebote</td><td>Thalamo-cortical, rebote</td><td class="num">0.02</td><td class="num">0.25</td><td class="num">−65</td><td class="num">0.05</td><td>I₃: −15 → 0 en t = 100 ms</td><td class="num">4</td></tr>
+        <tr><td class="sym">RZ</td><td>Resonator</td><td class="num">0.1</td><td class="num">0.26</td><td class="num">−65</td><td class="num">2</td><td>I₄: 0.2 desde t = 10 ms, pulso de 10 en 100–101 ms</td><td class="num">3</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note read">Valores comunes: g₂ = 0.04, g₁ = 5, g₀ = 140, v₊ = 30 mV. Cada caso arranca de su reposo v*(c) con I = 0 (−70 mV para c = 0.2, −64.4 para 0.25, −62.5 para 0.26). TC aparece dos veces porque el paper lo muestra con dos corrientes distintas.</p>
+</section>
+
+<section class="lab" aria-labelledby="lab-h">
+  <div class="stack">
+    <span class="eyebrow">Banco de pruebas</span>
+    <h2 id="lab-h">Mové una letra y mirá qué cambia</h2>
+    <p class="note">Cómo se usa: tocá un botón (RS, IB, …) para cargar un tipo de neurona de la Figura 2 con su corriente, o arrastrá cualquier deslizador. En «Corriente I(t)» elegís la forma en el tiempo: las cuatro de la guía (I₁ a I₄), la del caso base, o una a medida con el valor antes y después de t₀ y un pulso opcional. Cada simulación es RK4 con h = 0.1 ms en 200 ms, desde el reposo v*(c) con I = 0.</p>
+    <p class="note" id="lab-err" role="alert" hidden></p>
+  </div>
+  <div class="lab-grid">
+    <div class="controls">
+      <div class="presets" role="group" aria-label="Tipos de neurona">
+        <button type="button" data-p="RS">RS</button>
+        <button type="button" data-p="IB">IB</button>
+        <button type="button" data-p="CH">CH</button>
+        <button type="button" data-p="FS">FS</button>
+        <button type="button" data-p="LTS">LTS</button>
+        <button type="button" data-p="TC1">TC</button>
+        <button type="button" data-p="TC2">TC rebote</button>
+        <button type="button" data-p="RZ">RZ</button>
+      </div>
+      <dl class="readout">
+        <div><dt>spikes</dt><dd id="r-n">–</dd></div>
+        <div><dt>v* (I=0)</dt><dd id="r-vs">–</dd></div>
+        <div><dt>reposo con I final</dt><dd id="r-rest">–</dd></div>
+      </dl>
+      <div class="ctl"><label for="s-b"><b>b</b><span class="val" id="o-b"></span></label>
+        <input type="range" id="s-b" min="0.005" max="0.2" step="0.005"><small>velocidad de u (paper: a)</small></div>
+      <div class="ctl"><label for="s-c"><b>c</b><span class="val" id="o-c"></span></label>
+        <input type="range" id="s-c" min="0.1" max="0.3" step="0.005"><small>pendiente de la nulclina de u (paper: b)</small></div>
+      <div class="ctl"><label for="s-vm"><b>v₋</b><span class="val" id="o-vm"></span></label>
+        <input type="range" id="s-vm" min="-75" max="-40" step="1"><small>reseteo de v (paper: c)</small></div>
+      <div class="ctl"><label for="s-du"><b>Δu</b><span class="val" id="o-du"></span></label>
+        <input type="range" id="s-du" min="0" max="10" step="0.05"><small>salto de u por spike (paper: d)</small></div>
+      <fieldset class="cur">
+        <legend>Corriente I(t)</legend>
+        <div class="presets" role="group" aria-label="Formas de corriente">
+          <button type="button" data-i="base">base</button>
+          <button type="button" data-i="I1">I₁</button>
+          <button type="button" data-i="I2">I₂</button>
+          <button type="button" data-i="I3">I₃</button>
+          <button type="button" data-i="I4">I₄</button>
+        </div>
+        <div class="ctl"><label for="s-I0"><b>I antes de t₀</b><span class="val" id="o-I0"></span></label>
+          <input type="range" id="s-I0" min="-20" max="20" step="0.5"></div>
+        <div class="ctl"><label for="s-t0"><b>t₀</b><span class="val" id="o-t0"></span></label>
+          <input type="range" id="s-t0" min="0" max="200" step="1"><small>instante en que cambia la corriente</small></div>
+        <div class="ctl"><label for="s-I"><b>I después de t₀</b><span class="val" id="o-I"></span></label>
+          <input type="range" id="s-I" min="-5" max="25" step="0.25"></div>
+        <div class="ctl"><label for="s-Ip"><b>pulso (1 ms)</b><span class="val" id="o-Ip"></span></label>
+          <input type="range" id="s-Ip" min="0" max="20" step="0.5"><small>se suma a I durante 1 ms; 0 = sin pulso</small></div>
+        <div class="ctl"><label for="s-tp"><b>t del pulso</b><span class="val" id="o-tp"></span></label>
+          <input type="range" id="s-tp" min="0" max="199" step="1"></div>
+        <p class="note" id="cur-desc"></p>
+      </fieldset>
+    </div>
+    <div class="plots">
+      <div class="plot"><span class="cap">I(t) · gris punteado: t₀</span><canvas id="ci" height="80" aria-label="Corriente de entrada en función del tiempo"></canvas></div>
+      <div class="plot"><span class="cap"><span class="cv">v(t)</span> · líneas: <span class="cp">v₊</span>, <span class="cr">v₋</span></span><canvas id="cv" height="170" aria-label="Potencial v en función del tiempo"></canvas></div>
+      <div class="plot"><span class="cap"><span class="cu">u(t)</span> · cada escalón violeta es un salto Δu</span><canvas id="cu" height="120" aria-label="Variable u en función del tiempo"></canvas></div>
+      <div class="plot"><span class="cap">plano de fase (v, u) · negro: nulclina de v con la I final · naranja: nulclina de u</span><canvas id="cf" height="230" aria-label="Plano de fase"></canvas></div>
+    </div>
+  </div>
+</section>
+
+
+</div>
+
+<script>
+(function boot() {
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); return; }
+  const G2 = 0.04, G1 = 5, G0 = 140, VP = 30, H = 0.1, T = 200;
+  // corrientes de la guía 6: I(t) = (t < t0 ? I0 : I) + pulso de 1 ms de altura Ip en tp
+  const CORR = {
+    base: { I0: 0,   t0: 10,  I: 10,  Ip: 0,  tp: 100, desc: 'Caso base (TP 1.1): 0 hasta 10 ms, después 10.' },
+    I1:   { I0: 0,   t0: 25,  I: 10,  Ip: 0,  tp: 100, desc: 'I₁: escalón a 10 en t = 25 ms. Para RS, IB, CH, FS y LTS.' },
+    I2:   { I0: 0,   t0: 150, I: 2.5, Ip: 0,  tp: 100, desc: 'I₂: escalón chico (2.5) tardío, en t = 150 ms. TC despolarizado.' },
+    I3:   { I0: -15, t0: 100, I: 0,   Ip: 0,  tp: 100, desc: 'I₃: −15 hasta t = 100 ms y después 0. TC, disparo de rebote.' },
+    I4:   { I0: 0,   t0: 10,  I: 0.2, Ip: 10, tp: 100, desc: 'I₄: 0.2 desde t = 10 ms y un pulso de 10 entre 100 y 101 ms. RZ.' }
+  };
+  const CKEYS = ['I0', 't0', 'I', 'Ip', 'tp'];
+  const conI = (q, k) => { const o = Object.assign({}, q); CKEYS.forEach(c => { o[c] = CORR[k][c]; }); return o; };
+  const PRESETS = {
+    RS:  conI({ b: 0.02, c: 0.2,  vm: -65, du: 8    }, 'I1'),
+    IB:  conI({ b: 0.02, c: 0.2,  vm: -55, du: 4    }, 'I1'),
+    CH:  conI({ b: 0.02, c: 0.2,  vm: -50, du: 2    }, 'I1'),
+    FS:  conI({ b: 0.1,  c: 0.2,  vm: -65, du: 2    }, 'I1'),
+    LTS: conI({ b: 0.02, c: 0.25, vm: -65, du: 2    }, 'I1'),
+    TC1: conI({ b: 0.02, c: 0.25, vm: -65, du: 0.05 }, 'I2'),
+    TC2: conI({ b: 0.02, c: 0.25, vm: -65, du: 0.05 }, 'I3'),
+    RZ:  conI({ b: 0.1,  c: 0.26, vm: -65, du: 2    }, 'I4')
+  };
+  const Iext = (p, t) => (t < p.t0 ? p.I0 : p.I) + (t >= p.tp && t < p.tp + 1 ? p.Ip : 0);
+  const ids = { b: 's-b', c: 's-c', vm: 's-vm', du: 's-du', I0: 's-I0', t0: 's-t0', I: 's-I', Ip: 's-Ip', tp: 's-tp' };
+  const fmt = { b: x => x.toFixed(3) + '  (1/b = ' + (1 / x).toFixed(0) + ' ms)', c: x => x.toFixed(3), vm: x => x.toFixed(0) + ' mV', du: x => x.toFixed(2),
+                I0: x => x.toFixed(1), t0: x => x.toFixed(0) + ' ms', I: x => x.toFixed(2), Ip: x => (x ? x.toFixed(1) : 'sin pulso'), tp: x => x.toFixed(0) + '–' + (x + 1).toFixed(0) + ' ms' };
+  let P = Object.assign({}, PRESETS.RS);
+
+  function rest(c, I) {
+    const A = G2, B = G1 - c, C = G0 + I, d = B * B - 4 * A * C;
+    return d < 0 ? null : (-B - Math.sqrt(d)) / (2 * A);
+  }
+  function simulate(p) {
+    const n = Math.round(T / H);
+    const r0 = rest(p.c, 0), v0 = r0 === null ? -70 : r0;
+    let v = v0, u = p.c * v0;
+    const V = new Float64Array(n + 1), U = new Float64Array(n + 1), S = [];
+    V[0] = v; U[0] = u;
+    const f = (v, u, t) => [G2 * v * v + G1 * v + G0 - u + Iext(p, t), p.b * (p.c * v - u)];
+    for (let j = 0; j < n; j++) {
+      const t = j * H;
+      const k1 = f(v, u, t), k2 = f(v + H / 2 * k1[0], u + H / 2 * k1[1], t + H / 2);
+      const k3 = f(v + H / 2 * k2[0], u + H / 2 * k2[1], t + H / 2), k4 = f(v + H * k3[0], u + H * k3[1], t + H);
+      v += H / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]);
+      u += H / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
+      if (!isFinite(v) || v >= VP) { V[j + 1] = VP; U[j + 1] = u; S.push(j + 1); v = p.vm; u += p.du; }
+      else { V[j + 1] = v; U[j + 1] = u; }
+    }
+    return { V, U, S, n };
+  }
+
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function setup(cv) {
+    const dpr = window.devicePixelRatio || 1, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    // si el visor todavía no le dio ancho al canvas, usamos el del contenedor (o 600 px)
+    const w = cv.clientWidth || (cv.parentElement && cv.parentElement.clientWidth) || 600;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.height = h + 'px';
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { g, w, h };
+  }
+  function frame(g, w, h, x0, x1, y0, y1, xt, yt) {
+    const L = 40, R = 16, Tp = 8, B = 20;
+    const X = x => L + (x - x0) / (x1 - x0) * (w - L - R);
+    const Y = y => Tp + (1 - (y - y0) / (y1 - y0)) * (h - Tp - B);
+    g.clearRect(0, 0, w, h);
+    g.font = '11px "IBM Plex Mono", monospace'; g.lineWidth = 1;
+    g.strokeStyle = css('--line'); g.fillStyle = css('--muted');
+    g.textAlign = 'right'; g.textBaseline = 'middle';
+    yt.forEach(y => { g.beginPath(); g.moveTo(L, Y(y)); g.lineTo(w - R, Y(y)); g.stroke(); g.fillText(y, L - 5, Y(y)); });
+    g.textAlign = 'center'; g.textBaseline = 'top';
+    xt.forEach(x => g.fillText(x, X(x), h - B + 5));
+    return { X, Y };
+  }
+  function ticks(a, b, n) {
+    const step0 = (b - a) / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+    const step = [1, 2, 5, 10].map(m => m * mag).find(s => s >= step0);
+    const out = []; for (let x = Math.ceil(a / step) * step; x <= b + 1e-9; x += step) out.push(+x.toFixed(6));
+    return out;
+  }
+  function hline(g, X, Y, y, x0, x1, col) {
+    g.save(); g.setLineDash([4, 3]); g.strokeStyle = col; g.beginPath(); g.moveTo(X(x0), Y(y)); g.lineTo(X(x1), Y(y)); g.stroke(); g.restore();
+  }
+
+  function draw() {
+    const r = simulate(P), n = r.n;
+    // I(t)
+    {
+      const cc = setup(document.getElementById('ci'));
+      let lo = Math.min(0, P.I0, P.I), hi = Math.max(0, P.I0, P.I + P.Ip, P.I0 + P.Ip);
+      if (hi - lo < 2) { hi += 1; lo -= 1; }
+      const pd = (hi - lo) * 0.12;
+      const FI = frame(cc.g, cc.w, cc.h, 0, T, lo - pd, hi + pd, ticks(0, T, 8), ticks(lo, hi, 2));
+      cc.g.save(); cc.g.setLineDash([3, 3]); cc.g.strokeStyle = css('--muted'); cc.g.beginPath(); cc.g.moveTo(FI.X(P.t0), FI.Y(lo - pd)); cc.g.lineTo(FI.X(P.t0), FI.Y(hi + pd)); cc.g.stroke(); cc.g.restore();
+      cc.g.strokeStyle = css('--ink'); cc.g.lineWidth = 1.5; cc.g.beginPath();
+      for (let j = 0; j <= 2000; j++) { const t = j * T / 2000, x = FI.X(t), y = FI.Y(Iext(P, t)); j ? cc.g.lineTo(x, y) : cc.g.moveTo(x, y); }
+      cc.g.stroke();
+    }
+    // v(t)
+    let c = setup(document.getElementById('cv'));
+    let F = frame(c.g, c.w, c.h, 0, T, -90, 40, ticks(0, T, 8), [-80, -40, 0, 30]);
+    hline(c.g, F.X, F.Y, VP, 0, T, css('--peak')); hline(c.g, F.X, F.Y, P.vm, 0, T, css('--reset'));
+    c.g.strokeStyle = css('--v'); c.g.lineWidth = 1.3; c.g.beginPath();
+    for (let j = 0; j <= n; j++) { const x = F.X(j * H), y = F.Y(Math.max(-90, r.V[j])); j ? c.g.lineTo(x, y) : c.g.moveTo(x, y); }
+    c.g.stroke();
+    // u(t)
+    let umin = Infinity, umax = -Infinity;
+    for (let j = 0; j <= n; j++) { umin = Math.min(umin, r.U[j]); umax = Math.max(umax, r.U[j]); }
+    r.S.forEach(j => { umax = Math.max(umax, r.U[j] + P.du); });
+    if (umax - umin < 2) { umin -= 1; umax += 1; }
+    const pad = (umax - umin) * 0.08;
+    c = setup(document.getElementById('cu'));
+    F = frame(c.g, c.w, c.h, 0, T, umin - pad, umax + pad, ticks(0, T, 8), ticks(umin, umax, 3));
+    c.g.strokeStyle = css('--u'); c.g.lineWidth = 1.3; c.g.beginPath();
+    for (let j = 0; j <= n; j++) { const x = F.X(j * H), y = F.Y(r.U[j]); j ? c.g.lineTo(x, y) : c.g.moveTo(x, y); }
+    c.g.stroke();
+    c.g.strokeStyle = css('--jump'); c.g.lineWidth = 1.6;
+    r.S.forEach(j => { c.g.beginPath(); c.g.moveTo(F.X(j * H), F.Y(r.U[j])); c.g.lineTo(F.X(j * H), F.Y(r.U[j] + P.du)); c.g.stroke(); });
+    // plano de fase
+    const v0 = -85, v1 = 35;
+    let p0 = Math.min(umin, P.c * -80) - 2, p1 = Math.max(umax, -5) + 3;
+    c = setup(document.getElementById('cf'));
+    F = frame(c.g, c.w, c.h, v0, v1, p0, p1, ticks(v0, v1, 6), ticks(p0, p1, 4));
+    c.g.save(); c.g.beginPath(); c.g.rect(40, 8, c.w - 56, c.h - 28); c.g.clip();
+    const curve = (fn, col, w, dash) => {
+      c.g.strokeStyle = col; c.g.lineWidth = w; c.g.setLineDash(dash || []); c.g.beginPath();
+      for (let k = 0; k <= 240; k++) { const vv = v0 + (v1 - v0) * k / 240, x = F.X(vv), y = F.Y(fn(vv)); k ? c.g.lineTo(x, y) : c.g.moveTo(x, y); }
+      c.g.stroke(); c.g.setLineDash([]);
+    };
+    curve(vv => G2 * vv * vv + G1 * vv + G0 + P.I, css('--ink'), 1.4);
+    curve(vv => P.c * vv, css('--u'), 1.4);
+    const vline = (x, col) => { c.g.save(); c.g.setLineDash([4, 3]); c.g.strokeStyle = col; c.g.lineWidth = 1; c.g.beginPath(); c.g.moveTo(F.X(x), F.Y(p0)); c.g.lineTo(F.X(x), F.Y(p1)); c.g.stroke(); c.g.restore(); };
+    vline(VP, css('--peak')); vline(P.vm, css('--reset'));
+    c.g.strokeStyle = css('--v'); c.g.lineWidth = 1.2; c.g.beginPath();
+    const spk = new Set(r.S);
+    for (let j = 0; j <= n; j++) {
+      const x = F.X(r.V[j]), y = F.Y(r.U[j]);
+      if (j === 0 || spk.has(j - 1)) c.g.moveTo(x, y); else c.g.lineTo(x, y);
+    }
+    c.g.stroke();
+    c.g.strokeStyle = css('--jump'); c.g.setLineDash([3, 3]); c.g.lineWidth = 1;
+    r.S.slice(0, 6).forEach(j => { c.g.beginPath(); c.g.moveTo(F.X(VP), F.Y(r.U[j])); c.g.lineTo(F.X(P.vm), F.Y(r.U[j] + P.du)); c.g.stroke(); });
+    c.g.restore();
+    // lecturas
+    document.getElementById('r-n').textContent = r.S.length;
+    const vs = rest(P.c, 0), vI = rest(P.c, P.I);
+    document.getElementById('r-vs').textContent = vs === null ? 'no hay' : vs.toFixed(1);
+    document.getElementById('r-rest').textContent = vI === null ? 'no' : 'sí, ' + vI.toFixed(1);
+  }
+
+  const errBox = document.getElementById('lab-err');
+  function safeDraw() {
+    try { draw(); errBox.hidden = true; }
+    catch (e) { errBox.hidden = false; errBox.textContent = 'El banco de pruebas tuvo un error: ' + (e && e.message ? e.message : e); }
+  }
+  function sync() {
+    for (const k in ids) { document.getElementById(ids[k]).value = P[k]; document.getElementById('o-' + k).textContent = fmt[k](P[k]); }
+  }
+  function markPreset() {
+    const same = q => Object.keys(q).filter(k => k !== 'desc').every(k => Math.abs(q[k] - P[k]) < 1e-9);
+    document.querySelectorAll('button[data-p]').forEach(btn => btn.setAttribute('aria-pressed', String(same(PRESETS[btn.dataset.p]))));
+    let desc = 'Corriente a medida: ' + fmt.I0(P.I0) + ' hasta t₀ = ' + fmt.t0(P.t0) + ', después ' + fmt.I(P.I) + (P.Ip ? ', con un pulso de ' + fmt.Ip(P.Ip) + ' en ' + fmt.tp(P.tp) : '') + '.';
+    document.querySelectorAll('button[data-i]').forEach(btn => {
+      const q = CORR[btn.dataset.i], on = CKEYS.every(k => Math.abs(q[k] - P[k]) < 1e-9);
+      btn.setAttribute('aria-pressed', String(on)); if (on) desc = q.desc;
+    });
+    document.getElementById('cur-desc').textContent = desc;
+  }
+  for (const k in ids) {
+    const onMove = e => {
+      P[k] = parseFloat(e.target.value); document.getElementById('o-' + k).textContent = fmt[k](P[k]); markPreset(); safeDraw();
+    };
+    document.getElementById(ids[k]).addEventListener('input', onMove);
+    document.getElementById(ids[k]).addEventListener('change', onMove);
+  }
+  document.querySelectorAll('button[data-p]').forEach(btn => btn.addEventListener('click', () => {
+    P = Object.assign({}, PRESETS[btn.dataset.p]); sync(); markPreset(); safeDraw();
+  }));
+  document.querySelectorAll('button[data-i]').forEach(btn => btn.addEventListener('click', () => {
+    P = conI(P, btn.dataset.i); sync(); markPreset(); safeDraw();
+  }));
+  let rt; const later = () => { clearTimeout(rt); rt = setTimeout(safeDraw, 60); };
+  window.addEventListener('resize', later);
+  // redibuja cuando el panel cambia de ancho (por ejemplo, cuando el visor termina de abrirse)
+  try { const ro = new ResizeObserver(later); document.querySelectorAll('.plots canvas').forEach(c => ro.observe(c)); } catch (e) {}
+  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', later); } catch (e) {}
+  try { new MutationObserver(later).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (e) {}
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
+  window.addEventListener('load', later);
+  sync(); markPreset(); safeDraw();
+})();
+</script>

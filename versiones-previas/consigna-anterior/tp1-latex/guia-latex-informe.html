@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informe TP1 en LaTeX</title>
+<style>
+:root{
+  --bg:#fbfaf7; --fg:#1e1d1a; --muted:#625f57; --card:#ffffff; --line:#e3dfd5;
+  --accent:#2f5d8a; --accent-bg:#e9f0f7; --code-bg:#f3f1ec; --warn:#8a4b12; --warn-bg:#fbf0e3; --ok:#2d6a3e;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --fg:#e8e6e1; --muted:#a29f97; --card:#1f2024; --line:#33343a;
+    --accent:#8db8e3; --accent-bg:#1f2b38; --code-bg:#24262b; --warn:#e8b27c; --warn-bg:#33281d; --ok:#8fd0a0;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16171a; --fg:#e8e6e1; --muted:#a29f97; --card:#1f2024; --line:#33343a;
+  --accent:#8db8e3; --accent-bg:#1f2b38; --code-bg:#24262b; --warn:#e8b27c; --warn-bg:#33281d; --ok:#8fd0a0;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 Georgia,"Iowan Old Style","Palatino Linotype",serif}
+.wrap{max-width:820px;margin:0 auto;padding:40px 16px 80px}
+header .kicker{font:600 12px/1.4 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:2.1rem;line-height:1.15;margin:.3em 0 .4em}
+h2{font-size:1.45rem;margin:2.4em 0 .5em;padding-top:.6em;border-top:1px solid var(--line)}
+h2 .n{font:600 .8rem system-ui,sans-serif;color:var(--accent);margin-right:.5em;letter-spacing:.05em}
+h3{font-size:1.1rem;margin:1.6em 0 .3em}
+p,li{max-width:70ch}
+a{color:var(--accent)}
+.lead{font-size:1.1rem;color:var(--muted)}
+code{font:0.88em/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:.8em 0 1.2em}
+pre code{background:none;padding:0;font:inherit}
+.c{color:var(--muted)}
+nav.toc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:1.6em 0;font:15px/1.7 system-ui,sans-serif}
+nav.toc ol{margin:0;padding-left:1.3em;columns:2;column-gap:2em}
+@media (max-width:600px){nav.toc ol{columns:1}}
+.box{border-radius:10px;padding:12px 16px;margin:1.2em 0;font:15px/1.6 system-ui,sans-serif}
+.box.tip{background:var(--accent-bg)}
+.box.warn{background:var(--warn-bg);color:var(--fg)}
+.box b.t{display:block;margin-bottom:2px}
+.box.warn b.t{color:var(--warn)} .box.tip b.t{color:var(--accent)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:1em 0}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font:15px/1.55 system-ui,sans-serif}
+.card h4{margin:0 0 .3em;font-size:1rem}
+.card .tag{font:600 11px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--ok)}
+.card ul{padding-left:1.1em;margin:.4em 0 0}
+table{border-collapse:collapse;width:100%;font:14.5px/1.45 system-ui,sans-serif;margin:.8em 0 1.4em}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+.tablewrap{overflow-x:auto}
+.pages{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1em 0 1.5em}
+@media (max-width:640px){.pages{grid-template-columns:repeat(2,1fr)}}
+.page{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px;font:13px/1.45 system-ui,sans-serif;aspect-ratio:1/1.3;overflow:hidden}
+.page b{display:block;color:var(--accent);margin-bottom:4px}
+ol.steps>li{margin-bottom:.5em}
+footer{margin-top:3em;color:var(--muted);font:13px system-ui,sans-serif}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Redes Neuronales 2026 · FaMAF–UNC · TP1</div>
+  <h1>Cómo escribir el informe del TP1 en LaTeX</h1>
+  <p class="lead">Qué es LaTeX, dónde usarlo, cómo se arma el informe que pide la cátedra y un boceto listo para completar. El boceto (<code>main.tex</code>) ya compila, tiene las figuras de la guía del TP y entra justo en las 4 páginas.</p>
+</header>
+
+<nav class="toc">
+<ol>
+  <li><a href="#que">Qué es LaTeX</a></li>
+  <li><a href="#donde">Dónde usarlo</a></li>
+  <li><a href="#overleaf">Arrancar en Overleaf</a></li>
+  <li><a href="#local">Alternativa local (Windows)</a></li>
+  <li><a href="#anatomia">Anatomía del archivo</a></li>
+  <li><a href="#estructura">Estructura del informe</a></li>
+  <li><a href="#chuleta">Chuleta de comandos</a></li>
+  <li><a href="#figuras">Figuras desde Python</a></li>
+  <li><a href="#biblio">Referencias</a></li>
+  <li><a href="#errores">Errores típicos</a></li>
+  <li><a href="#entrega">Checklist de entrega</a></li>
+</ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="que"><span class="n">01</span>Qué es LaTeX</h2>
+<p>LaTeX no es un procesador de texto tipo Word. Se escribe un archivo de texto plano (<code>.tex</code>) con el contenido y unos comandos que dicen qué es cada cosa (“esto es una sección”, “esto es una ecuación”, “acá va la figura 2”). Después se <b>compila</b>, y el compilador produce el PDF con la tipografía, la numeración y las referencias resueltas.</p>
+<p>Para un informe científico tiene tres ventajas concretas: las ecuaciones salen bien sin esfuerzo, las figuras, tablas y ecuaciones se numeran solas (si agregás una figura nueva, todas las referencias se actualizan), y el formato queda consistente sin pelearse con el estilo.</p>
+<pre><code><span class="c">% esto es un comentario: LaTeX lo ignora</span>
+\section{Teoría}
+El potencial cumple
+\begin{equation}
+  \dot v = 0{,}04\,v^2 + 5v + 140 - u + I .
+  \label{eq:v}
+\end{equation}
+Como se ve en la Ec.~\eqref{eq:v}, ...</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="donde"><span class="n">02</span>Dónde usarlo</h2>
+<div class="grid">
+  <div class="card">
+    <span class="tag">Recomendado</span>
+    <h4>Overleaf (en el navegador)</h4>
+    <ul>
+      <li>No hay que instalar nada: entrás a <a href="https://www.overleaf.com">overleaf.com</a> con una cuenta gratuita.</li>
+      <li>Editor a la izquierda, PDF a la derecha, botón <i>Recompile</i>.</li>
+      <li>Ideal para trabajar en grupo: el proyecto se comparte y todos editan el mismo archivo.</li>
+      <li>La cátedra ya dejó un draft ahí (link en la consigna).</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Instalación local</h4>
+    <ul>
+      <li>MiKTeX o TeX Live + un editor (VS Code con LaTeX Workshop, o TeXstudio).</li>
+      <li>Funciona sin internet y compila más rápido.</li>
+      <li>Para trabajar en grupo hay que coordinar con git o carpetas compartidas.</li>
+      <li>Conviene si ya lo tenés instalado o si van a escribir mucho LaTeX en la carrera.</li>
+    </ul>
+  </div>
+</div>
+<p>Para este TP, con un grupo y una entrega cercana, Overleaf es lo más directo.</p>
+
+<!-- ============================================================ -->
+<h2 id="overleaf"><span class="n">03</span>Arrancar en Overleaf</h2>
+<ol class="steps">
+  <li>Creá una cuenta en <a href="https://www.overleaf.com">overleaf.com</a> (podés entrar con Google o con el mail de la facultad).</li>
+  <li>Bajá <code>informe-tp1-overleaf.zip</code> de los archivos de este proyecto. Trae <code>main.tex</code> y la carpeta <code>figuras/</code>.</li>
+  <li>En Overleaf: <b>New Project → Upload Project</b> y elegí el zip. Se abre el proyecto con el árbol de archivos a la izquierda.</li>
+  <li>Verificá que el compilador sea <b>pdfLaTeX</b> (menú <b>Menu → Compiler</b>; es el que viene por defecto) y apretá <b>Recompile</b>. Tenés que ver el PDF de 4 páginas.</li>
+  <li>Compartí el proyecto con tus compañeros desde <b>Share</b> (con mail). El plan gratuito limita la cantidad de colaboradores por proyecto; si no alcanza para todo el grupo, uno puede compartir el link de edición o turnarse.</li>
+  <li>Editá, guardá (es automático) y recompilá seguido: si algo se rompe, es más fácil encontrar el error cuando cambiaste poco.</li>
+  <li>Para la entrega: el ícono de descarga junto a <i>Recompile</i> baja el PDF.</li>
+</ol>
+<div class="box tip"><b class="t">Si prefieren partir del draft de la cátedra</b>Abrí el link de la consigna (<a href="https://www.overleaf.com/read/qwctszcmgpkn#ed2041">overleaf.com/read/qwctszcmgpkn</a>), elegí <b>Menu → Copy Project</b>, y pegá ahí las secciones que quieran del boceto. Así respetan exactamente el formato que espera la cátedra.</div>
+<div class="box tip"><b class="t">Atajos útiles en Overleaf</b><code>Ctrl+Enter</code> recompila. Hacer doble clic en el PDF lleva a la línea del <code>.tex</code> correspondiente. El panel de “Logs and output files” muestra los errores con número de línea.</div>
+
+<!-- ============================================================ -->
+<h2 id="local"><span class="n">04</span>Alternativa local (Windows)</h2>
+<ol class="steps">
+  <li>Instalá <a href="https://miktex.org/download">MiKTeX</a>. Cuando pregunte, elegí que instale paquetes faltantes automáticamente (“Install missing packages on-the-fly: Yes”).</li>
+  <li>Instalá un editor: <a href="https://www.texstudio.org/">TeXstudio</a> (todo en uno), o VS Code con la extensión <b>LaTeX Workshop</b>. Con VS Code también hace falta Perl para <code>latexmk</code> (por ejemplo, Strawberry Perl).</li>
+  <li>Descomprimí el zip en tu carpeta del TP, abrí <code>main.tex</code> y compilá (en TeXstudio, F5; en VS Code se compila al guardar).</li>
+  <li>Desde una terminal también funciona: <code>pdflatex main.tex</code> dos veces (la segunda resuelve las referencias), o <code>latexmk -pdf main.tex</code> que hace las pasadas necesarias solo.</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="anatomia"><span class="n">05</span>Anatomía del archivo</h2>
+<p>Un <code>.tex</code> tiene dos partes: el <b>preámbulo</b> (configuración, antes de <code>\begin{document}</code>) y el <b>cuerpo</b> (el contenido). En el boceto, el preámbulo ya está resuelto y no hace falta tocarlo:</p>
+<pre><code>\documentclass[10pt,a4paper,twocolumn]{article}  <span class="c">% tipo de documento, a dos columnas</span>
+\usepackage[spanish,es-tabla]{babel}              <span class="c">% español: "Figura", "Tabla", guiones</span>
+\usepackage[a4paper,margin=1.8cm]{geometry}       <span class="c">% márgenes</span>
+\usepackage{amsmath,siunitx}                      <span class="c">% ecuaciones y unidades (coma decimal)</span>
+\usepackage{graphicx}  \graphicspath{{figuras/}}  <span class="c">% imágenes, buscadas en figuras/</span>
+\usepackage{booktabs,subcaption,hyperref}         <span class="c">% tablas, subfiguras, links</span>
+
+\title{...}  \author{...}
+
+\begin{document}
+  \maketitle
+  \begin{abstract} ... \end{abstract}
+  \section{Introducción} ...
+  ...
+\end{document}</code></pre>
+<p>Usamos dos columnas porque es el formato habitual de un artículo corto y porque permite meter cuatro figuras en cuatro páginas. Si prefieren una sola columna, saquen <code>twocolumn</code> de la primera línea, cambien <code>figure*</code> por <code>figure</code> y revisen que siga entrando en 4 páginas (probablemente tengan que achicar figuras).</p>
+
+<!-- ============================================================ -->
+<h2 id="estructura"><span class="n">06</span>Estructura del informe</h2>
+<p>La consigna pide exactamente estas secciones, en este orden. El boceto ya las tiene; esta tabla dice qué va en cada una.</p>
+<div class="tablewrap">
+<table>
+<tr><th>Sección</th><th>En LaTeX</th><th>Qué tiene que tener</th></tr>
+<tr><td>Título</td><td><code>\title{}</code></td><td>Claro y concreto. Ej.: “Simulación numérica del modelo de neuronas de Izhikevich”.</td></tr>
+<tr><td>Autores</td><td><code>\author{}</code></td><td>Nombre completo de todos los integrantes.</td></tr>
+<tr><td>Resumen</td><td><code>abstract</code></td><td>5 a 10 líneas: objetivo, método (RK4, Euler–Maruyama) y resultados principales.</td></tr>
+<tr><td>Introducción</td><td><code>\section{}</code></td><td>Qué es un modelo de neurona, por qué Izhikevich es relevante, citas [1–3], objetivo del informe.</td></tr>
+<tr><td>Teoría</td><td><code>\section{}</code></td><td>Ecuaciones (1)–(3), significado de <i>v</i>, <i>u</i> y de los parámetros, y el método numérico.</td></tr>
+<tr><td>Resultados</td><td><code>\section{}</code></td><td>Figuras con leyenda completa, cada una mencionada en el texto (“En la Figura 2 se observa…”).</td></tr>
+<tr><td>Discusión</td><td><code>\section{}</code></td><td>¿Se reproducen los tipos de disparo? Fuentes de error numérico. Importancia del modelo.</td></tr>
+<tr><td>Agradecimientos</td><td><code>\section*{}</code></td><td>Opcional. El asterisco hace que no se numere.</td></tr>
+<tr><td>Referencias</td><td><code>thebibliography</code></td><td>Las citas que usaron, mencionadas en la introducción.</td></tr>
+</table>
+</div>
+
+<h3>Cómo queda repartido en 4 páginas (el boceto compilado)</h3>
+<div class="pages">
+  <div class="page"><b>Página 1</b>Título, autores, resumen a todo el ancho. Introducción, Teoría (modelo y parámetros), inicio del método numérico.</div>
+  <div class="page"><b>Página 2</b>Fig. 1 (caso base). Tabla 1 (parámetros). Resultados: caso base y los ocho tipos.</div>
+  <div class="page"><b>Página 3</b>Fig. 2 a doble columna (los ocho tipos). Fig. 3 (error numérico). Red. Discusión. Referencias.</div>
+  <div class="page"><b>Página 4</b>Fig. 4 a doble columna (red con Θ y con z(v)). Queda lugar para ampliar texto.</div>
+</div>
+<p>Si no hacen la parte 2, borren la subsección “Red de neuronas acopladas” y la Figura 4: ganan casi una página para la discusión o para otra figura de la guía (curva f–I o plano de fase).</p>
+
+<div class="box warn"><b class="t">La regla de la cátedra para figuras</b>La leyenda dice <b>qué se grafica</b> (“la curva azul es v(t) para…”). El texto de Resultados dice <b>qué se ve</b> (“en la Figura 2 se observa que…”). El <b>porqué</b> va en la Discusión. Toda figura tiene que estar citada en el texto.</div>
+
+<!-- ============================================================ -->
+<h2 id="chuleta"><span class="n">07</span>Chuleta de comandos</h2>
+
+<h3>Texto</h3>
+<pre><code>\section{Resultados}        \subsection{Red de neuronas}
+\emph{itálica}   \textbf{negrita}   ``comillas''
+Un párrafo nuevo se hace dejando una línea en blanco.
+Los acentos y la ñ se escriben directo: también, señal.
+Ojo con  %  $  &amp;  #  _  {  }  : se escriben  \%  \$  \&amp;  \#  \_  \{  \}</code></pre>
+
+<h3>Matemática</h3>
+<pre><code>En línea: la variable $u(t)$ y el paso $h = 0{,}1$ ms.
+
+Numerada (con etiqueta para citarla):
+\begin{equation}
+  v \leftarrow v_-, \qquad u \leftarrow u + \Delta u   \label{eq:reset}
+\end{equation}
+
+Varias alineadas en el signo =:
+\begin{align}
+  \dot v &amp;= g_2 v^2 + g_1 v + g_0 - u + I(t), \label{eq:v}\\
+  \dot u &amp;= b\,(c\,v - u),                    \label{eq:u}
+\end{align}
+
+Por casos:   I(t) = \begin{cases} 0, &amp; t &lt; 10,\\ 10, &amp; t \ge 10. \end{cases}
+
+Unidades y números con coma decimal (siunitx):
+\SI{-65}{\milivolt}    \num{0.02}  → 0,02     \mathcal{O}(h^4)</code></pre>
+<div class="box tip"><b class="t">Coma decimal</b>Dentro de <code>$...$</code>, escribir <code>0,04</code> deja un espacio feo después de la coma. Usen <code>0{,}04</code> o <code>\num{0.04}</code>.</div>
+
+<h3>Figuras</h3>
+<pre><code>\begin{figure}[t]                       <span class="c">% [t]: arriba de la página</span>
+  \centering
+  \includegraphics[width=\columnwidth]{f1_base.png}
+  \caption{Evolución temporal de $v(t)$ ... para $b = 0{,}02$ ...}
+  \label{fig:base}                      <span class="c">% el label SIEMPRE después del caption</span>
+\end{figure}
+
+\begin{figure*}[t]                      <span class="c">% figure* = ocupa las dos columnas</span>
+  ...  \includegraphics[width=0.72\textwidth]{f2_figura2.png} ...
+\end{figure*}
+
+En la Figura~\ref{fig:base} se observa ...   <span class="c">% ~ evita un salto de línea ahí</span></code></pre>
+<p>En el boceto aparece <code>\figura{archivo}{ancho}</code> en lugar de <code>\includegraphics</code>: es un comando definido en el preámbulo que inserta la imagen si existe o dibuja un recuadro con el nombre si todavía no la generaron. Así el documento compila siempre.</p>
+
+<h3>Tablas</h3>
+<pre><code>\begin{table}[t]
+  \centering
+  \caption{Parámetros de cada tipo de neurona.}   <span class="c">% en tablas el caption va arriba</span>
+  \label{tab:parametros}
+  \begin{tabular}{lccccc}                         <span class="c">% l = izquierda, c = centrado</span>
+    \toprule
+    Caso &amp; $b$ &amp; $c$ &amp; $v_-$ [mV] &amp; $\Delta u$ &amp; $I$ \\
+    \midrule
+    RS   &amp; 0,02 &amp; 0,2 &amp; $-65$ &amp; 8 &amp; $I_1$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="figuras"><span class="n">08</span>Figuras desde Python</h2>
+<p>Las figuras del boceto son las PNG en alta resolución que generó la guía del TP (<code>tp1-izhikevich/figs/</code>). Si regeneran o hacen figuras propias en matplotlib, conviene guardarlas en <b>PDF</b> (vectorial: no se pixela al hacer zoom) directamente en la carpeta <code>figuras/</code>:</p>
+<pre><code>import matplotlib.pyplot as plt
+plt.rcParams.update({"font.size": 9})          <span class="c"># parecido al tamaño del texto del informe</span>
+
+fig, ax = plt.subplots(figsize=(3.4, 2.4))     <span class="c"># 3.4 pulgadas ≈ ancho de una columna</span>
+ax.plot(t, v)
+ax.set_xlabel("t [ms]"); ax.set_ylabel("v [mV]")
+fig.savefig("figuras/fig1_base.pdf", bbox_inches="tight")</code></pre>
+<p>Para una figura a doble columna, usen <code>figsize=(7, ...)</code>. Si el ancho en Python coincide con el ancho en LaTeX, las letras de los ejes quedan del mismo tamaño que el texto. Una grilla de 8 paneles se arma en una sola imagen con <code>plt.subplots(4, 2)</code>.</p>
+<p>En Overleaf, las figuras se suben con el botón <b>Upload</b> del panel de archivos, dentro de la carpeta <code>figuras/</code>.</p>
+
+<!-- ============================================================ -->
+<h2 id="biblio"><span class="n">09</span>Referencias</h2>
+<p>Para tres o cuatro referencias, lo más simple es lo que usa el boceto: escribirlas a mano al final con <code>thebibliography</code> y citarlas con <code>\cite</code>.</p>
+<pre><code>Izhikevich~\cite{izhikevich2003} propuso ...          <span class="c">% sale como [1]</span>
+
+\begin{thebibliography}{9}
+\bibitem{izhikevich2003}
+  E.~M. Izhikevich, ``Simple model of spiking neurons,''
+  \emph{IEEE Trans.\ Neural Netw.} \textbf{14}(6), 1569--1572 (2003).
+\end{thebibliography}</code></pre>
+<p>Si quieren usar BibTeX (útil a futuro, porque Google Scholar exporta las entradas listas), creen un archivo <code>refs.bib</code>:</p>
+<pre><code>@article{izhikevich2003,
+  author  = {Izhikevich, Eugene M.},
+  title   = {Simple model of spiking neurons},
+  journal = {IEEE Transactions on Neural Networks},
+  volume  = {14}, number = {6}, pages = {1569--1572}, year = {2003}
+}</code></pre>
+<p>y reemplacen todo el bloque <code>thebibliography</code> por:</p>
+<pre><code>\bibliographystyle{unsrt}   <span class="c">% numera en orden de aparición</span>
+\bibliography{refs}</code></pre>
+<p>Overleaf corre BibTeX solo. En local, <code>latexmk -pdf main.tex</code> también; con <code>pdflatex</code> a mano la secuencia es pdflatex, bibtex, pdflatex, pdflatex.</p>
+
+<!-- ============================================================ -->
+<h2 id="errores"><span class="n">10</span>Errores típicos</h2>
+<div class="tablewrap">
+<table>
+<tr><th>Mensaje o síntoma</th><th>Causa probable</th><th>Arreglo</th></tr>
+<tr><td><code>Undefined control sequence</code></td><td>Comando mal escrito o de un paquete no cargado.</td><td>Ir a la línea que indica el log y revisar la ortografía del comando.</td></tr>
+<tr><td><code>Missing $ inserted</code></td><td>Un <code>_</code> o <code>^</code> fuera de modo matemático (ej.: <code>v_-</code> en texto).</td><td>Encerrarlo entre <code>$...$</code>.</td></tr>
+<tr><td>Aparece <code>??</code> en lugar del número de figura</td><td>Falta una segunda compilación, o el <code>\label</code> está antes del <code>\caption</code>.</td><td>Recompilar; poner <code>\label</code> después de <code>\caption</code>.</td></tr>
+<tr><td><code>File `...' not found</code></td><td>La imagen no está en <code>figuras/</code> o el nombre no coincide (mayúsculas, extensión).</td><td>Revisar el nombre exacto del archivo.</td></tr>
+<tr><td>Muchos errores raros desde el título</td><td>Un <code>]</code> dentro de <code>\twocolumn[...]</code> cierra el argumento antes de tiempo.</td><td>El boceto ya lo protege con llaves: <code>\twocolumn[{ ... }]</code>.</td></tr>
+<tr><td>Una figura aparece una página después</td><td>LaTeX ubica las figuras donde entran (son “flotantes”).</td><td>Es normal. Probar <code>[t]</code>, <code>[!t]</code>, o mover el bloque de la figura antes en el texto.</td></tr>
+<tr><td><code>Overfull \hbox</code></td><td>Algo es más ancho que la columna.</td><td>Es un warning: si no se ve mal, ignorarlo. Si sí, achicar la imagen o la tabla.</td></tr>
+<tr><td>Se pasa de 4 páginas</td><td>Figuras grandes o texto largo.</td><td>Achicar <code>width</code> de las figuras, combinar paneles en una sola imagen, recortar texto repetido entre Resultados y Discusión.</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="entrega"><span class="n">11</span>Checklist de entrega</h2>
+<ul>
+  <li>PDF de <b>4 páginas o menos</b> (el boceto, tal como está, ocupa 4 justas).</li>
+  <li>Nombres completos de todos los autores, sin corchetes ni <code>TODO</code> sueltos (busquen <code>[</code> y <code>TODO</code> en el <code>.tex</code>).</li>
+  <li>Todas las figuras citadas en el texto y con leyenda que se entienda sola.</li>
+  <li>Los números del texto coinciden con sus propias simulaciones.</li>
+  <li>Mail a francisco.tamarit@unc.edu.ar, juan.perotti@unc.edu.ar, tristan.osan@unc.edu.ar y francomilana@unc.edu.ar, y a todos los compañeros del grupo.</li>
+  <li>Asunto exacto: <b>Redes Neuronales 2026 - entrega TP1</b>.</li>
+  <li>Opcional: adjuntar la notebook o el código como archivo aparte.</li>
+</ul>
+
+<h3>Archivos de esta carpeta (<code>tp1-latex/</code>)</h3>
+<ul>
+  <li><code>main.tex</code>: el boceto del informe, comentado.</li>
+  <li><code>figuras/</code>: las seis figuras que usa el boceto, copiadas de la guía del TP.</li>
+  <li><code>informe-tp1-overleaf.zip</code>: <code>main.tex</code> + <code>figuras/</code>, listo para <b>Upload Project</b> en Overleaf.</li>
+  <li><code>main-compilado.pdf</code>: cómo se ve el boceto compilado.</li>
+</ul>
+
+<footer>Guía preparada para el TP1 de Redes Neuronales 2026 (FaMAF–UNC). Los números del texto del boceto salen de la guía paso a paso del TP; verifíquenlos con sus propias corridas antes de entregar.</footer>
+</div>
+</body>
+</html>

@@ -65,25 +65,50 @@ Parámetros base: `g2 = 0.04`, `g1 = 5`, `g0 = 140`, `v+ = 30 mV`.
 
 ## Estructura del repositorio
 
+Autores (grupo 36): Mariel Anachuri, Camila Giolitto, Martín Robins.
+
 ```
 Neurona-Izhikevich/
 ├── README.md
 ├── requirements.txt
+├── informe/
+│   ├── grupo36_mariel_anachuri_camila_giolitto_martin_robins_tp1.pdf   # informe entregado
+│   ├── latex/                 # fuente LaTeX del informe (main.tex + figuras/)
+│   └── borrador-introduccion.docx
 ├── notebooks/
-│   ├── parte1_neurona_individual.ipynb
-│   └── parte2_red_neuronas.ipynb
-├── src/
-│   ├── izhikevich.py        # ecuaciones del modelo y reseteo
-│   ├── integradores.py      # RK4 y Euler-Maruyama
-│   └── corrientes.py        # I1, I2, I3, I4
-├── figuras/                 # gráficos exportados para el informe
-└── informe/
-    └── TP1_Apellidos.pdf    # informe final (máx. 4 páginas)
+│   ├── TP1_Izhikevich.ipynb   # notebook final del grupo
+│   └── versiones-previas/
+├── simulaciones/
+│   ├── codigo/                # módulos y scripts que generan las figuras
+│   │   ├── izhikevich.py          # modelo, RK4/Euler, corrientes I1–I4, reseteo
+│   │   ├── red_izhikevich.py      # red de 1000 neuronas (Euler-Maruyama)
+│   │   ├── figuras.py             # regenera figs/ y resultados.json
+│   │   ├── figuras_teoria.py, figuras_rk4.py        # figuras de las guías
+│   │   ├── figura_ocho_casos_informe.py, figura_red_informe.py
+│   │   └── resultados.json        # tiempos de disparo y métricas
+│   ├── figs/                  # figuras generadas
+│   └── tp1_izhikevich.ipynb   # notebook extendida (análisis complementario)
+├── guias/                     # guías de estudio en HTML (abrir en el navegador)
+└── versiones-previas/         # informe LaTeX anterior y material de la consigna del 24/9
 ```
+
+### Cómo correr el código
+
+```bash
+pip install -r requirements.txt
+cd simulaciones/codigo
+python figuras.py              # regenera ../figs/*.png y resultados.json (~90 s)
+python figuras_teoria.py       # figuras de teoría en ../figs/teoria/
+python figuras_rk4.py
+python figura_ocho_casos_informe.py salida.png   # figura 2x4 de los ocho tipos (300 dpi)
+python figura_red_informe.py salida.png
+```
+
+Las notebooks se abren con `jupyter notebook notebooks/TP1_Izhikevich.ipynb`.
 
 ---
 
-**Dependencias:** Python 3.10+, `numpy`, `matplotlib`, `jupyter`.
+**Dependencias:** Python 3.10+, `numpy`, `scipy`, `matplotlib`, `jupyter`.
 
 ---
 

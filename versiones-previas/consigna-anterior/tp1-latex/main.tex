@@ -1,0 +1,319 @@
+% =====================================================================
+%  Redes Neuronales 2026 (FaMAF-UNC) - Trabajo Práctico 1
+%  Boceto de informe: "El modelo de neuronas de Izhikevich"
+%
+%  Cómo usarlo:
+%   - Overleaf: New Project > Upload Project > subí el .zip con main.tex y
+%     la carpeta figuras/. Compilá con pdfLaTeX (el botón "Recompile").
+%   - Local: latexmk -pdf main.tex   (o pdflatex main.tex dos veces).
+%
+%  Todo lo que está entre [corchetes] o marcado con TODO es para revisar o
+%  reemplazar. Los números del texto salen de la guía paso a paso del TP
+%  (carpeta tp1-izhikevich/): verifíquenlos contra sus propias corridas.
+%  Límite de la cátedra: el PDF final NO debe superar las 4 páginas.
+% =====================================================================
+\documentclass[10pt,a4paper,twocolumn]{article}
+
+% ---------- Idioma y codificación ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla,es-noshorthands]{babel} % "Tabla" en vez de "Cuadro"
+\usepackage{lmodern}
+
+% ---------- Página ----------
+\usepackage[a4paper,margin=1.8cm,columnsep=0.7cm]{geometry}
+\usepackage{microtype}
+
+% ---------- Matemática y unidades ----------
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}}          % 0,04 en vez de 0.04
+\DeclareSIUnit{\milivolt}{mV}
+
+% ---------- Figuras y tablas ----------
+\usepackage{graphicx}
+\graphicspath{{figuras/}}                     % las imágenes van en figuras/
+\usepackage{subcaption}                       % paneles (a), (b) dentro de una figura
+\usepackage{booktabs}                         % líneas lindas en tablas
+\usepackage[font=small,labelfont=bf]{caption}
+
+% ---------- Enlaces ----------
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+% ---------------------------------------------------------------------
+% \figura{archivo}{ancho}: incluye la imagen si existe en figuras/; si
+% todavía no la generaron, dibuja un recuadro con el nombre. Así el
+% documento compila siempre.
+% ---------------------------------------------------------------------
+\newcommand{\figura}[2]{%
+  \IfFileExists{figuras/#1}%
+    {\includegraphics[width=#2]{#1}}%
+    {\fbox{\parbox[c][0.45#2][c]{\dimexpr#2-2\fboxsep-2\fboxrule}{\centering\small\ttfamily figuras/#1\\(falta generar)}}}%
+}
+
+% =====================================================================
+\title{\textbf{Simulación numérica del modelo de neuronas de Izhikevich:\\
+tipos de disparo, error numérico y dinámica de red}}
+\author{%
+  [Nombre Apellido 1], [Nombre Apellido 2] y [Nombre Apellido 3]\\[2pt]
+  \small Facultad de Matemática, Astronomía, Física y Computación, Universidad Nacional de Córdoba
+}
+\date{Redes Neuronales 2026 -- Trabajo Práctico 1}
+
+\begin{document}
+
+% El resumen ocupa todo el ancho, debajo del título. Las llaves {...} protegen
+% los corchetes [ ] del texto, que si no cerrarían \twocolumn[...].
+\twocolumn[{
+  \begin{@twocolumnfalse}
+    \maketitle
+    \begin{abstract}
+    % 5 a 10 líneas: objetivo + metodología + resultados principales.
+    Estudiamos numéricamente el modelo de neuronas de Izhikevich, un sistema
+    bidimensional de ecuaciones diferenciales con reseteo que reproduce la variedad
+    de patrones de disparo de las neuronas corticales con un costo computacional
+    mínimo. Integramos el modelo con el método de Runge--Kutta de orden 4
+    ($h=\num{0.1}$\,ms) y reproducimos los ocho tipos de disparo de la figura~2 de
+    la Ref.~\cite{izhikevich2003}: regular spiking, intrinsically bursting,
+    chattering, fast spiking, tálamo-cortical, resonador y low-threshold spiking.
+    Mostramos que la condición inicial en el reposo es crítica para los casos de
+    umbral bajo, y que el reseteo discreto reduce a orden~1 la convergencia de RK4
+    en los tiempos de disparo. [Si hacen la parte 2:] Finalmente, simulamos una red de
+    1000 neuronas acopladas con ruido mediante Euler--Maruyama y observamos ritmos
+    $\alpha$ y $\gamma$, que se atenúan al reemplazar la activación escalón por una
+    función lineal $z(v)$.
+    \end{abstract}
+    \vspace{1em}
+  \end{@twocolumnfalse}
+}]
+
+% =====================================================================
+\section{Introducción}
+% Qué es un modelo de neurona, el compromiso realismo/eficiencia, citas, objetivo.
+Las neuronas se comunican mediante potenciales de acción o \emph{spikes}:
+excursiones bruscas y breves del potencial de membrana. Los modelos de neurona
+de disparo enfrentan un compromiso entre realismo y eficiencia. El modelo de
+Hodgkin y Huxley~\cite{hodgkin1952} describe el fenómeno con gran detalle
+biofísico, pero con varias ecuaciones acopladas y decenas de parámetros, lo
+que lo vuelve costoso para simular redes grandes. En el otro extremo, el
+modelo \emph{integrate-and-fire} es muy eficiente pero no reproduce la riqueza
+de patrones de disparo observada experimentalmente.
+
+Izhikevich~\cite{izhikevich2003} propuso un modelo que resuelve ese
+compromiso: dos ecuaciones con un único término no lineal, obtenidas por
+reducción a la forma normal de las bifurcaciones que dan origen al
+disparo~\cite{izhikevich2007}. Con sólo cuatro parámetros reproduce los
+principales tipos de disparo de neuronas corticales y talámicas, y permite
+simular decenas de miles de neuronas en tiempo real.
+
+El objetivo de este informe es integrar numéricamente el modelo, reproducir
+sus tipos de disparo y analizar la precisión del método numérico
+[y la dinámica colectiva de una red de neuronas acopladas]. % TODO
+
+% =====================================================================
+\section{Teoría}
+\subsection{El modelo de Izhikevich}
+El estado de la neurona se describe con el potencial de membrana $v(t)$, en mV,
+y una variable de recuperación $u(t)$, que representa en forma efectiva la
+activación de corrientes de K$^+$ y la inactivación de corrientes de Na$^+$, y
+aporta una realimentación negativa sobre $v$. Con $t$ en ms,
+\begin{align}
+  \dot v &= g_2\,v^2 + g_1\,v + g_0 - u + I(t), \label{eq:v}\\
+  \dot u &= b\,(c\,v - u), \label{eq:u}
+\end{align}
+donde $I(t)$ es la corriente de entrada (sináptica o inyectada). Cuando
+$v\geq v_+$ se considera que la neurona disparó y se aplica el reseteo
+\begin{equation}
+  v \leftarrow v_-, \qquad u \leftarrow u + \Delta u .
+  \label{eq:reset}
+\end{equation}
+Los parámetros (entre paréntesis, la notación de la Ref.~\cite{izhikevich2003}) son:
+$b$ ($a$), la escala temporal de $u$: valores chicos implican recuperación lenta;
+$c$ ($b$), la sensibilidad de $u$ a las fluctuaciones subumbrales de $v$;
+$v_-$ ($c$), el potencial de reseteo; y $\Delta u$ ($d$), el salto de $u$ en cada
+spike. Los coeficientes $g_2=\num{0.04}$, $g_1=5$ y $g_0=140$ fijan las unidades,
+y $v_+=\SI{30}{\milivolt}$ es el pico del spike.
+
+Para $I$ constante, el reposo es la raíz menor de
+$g_2v^2+(g_1-c)v+g_0+I=0$, con $u^*=c\,v^*$; para $c=\num{0.2}$ e $I=0$ resulta
+$v^*=\SI{-70}{\milivolt}$. [Si hay lugar: el reposo se pierde en
+$I_\mathrm{Hopf}\approx\num{3.8}$ e $I_\mathrm{SN}=4$.] % TODO
+
+\subsection{Método numérico}
+Con $\mathbf{x}=(v,u)$ y $\dot{\mathbf{x}}=\mathbf{f}(t,\mathbf{x})$, usamos
+Runge--Kutta de orden~4:
+\begin{equation}
+  \mathbf{x}_{n+1} = \mathbf{x}_n + \tfrac{h}{6}\left(\mathbf{k}_1 + 2\mathbf{k}_2 + 2\mathbf{k}_3 + \mathbf{k}_4\right),
+\end{equation}
+con $\mathbf{k}_1=\mathbf{f}(t_n,\mathbf{x}_n)$,
+$\mathbf{k}_{2,3}=\mathbf{f}(t_n+\tfrac h2,\mathbf{x}_n+\tfrac h2\mathbf{k}_{1,2})$ y
+$\mathbf{k}_4=\mathbf{f}(t_n+h,\mathbf{x}_n+h\mathbf{k}_3)$.
+Después de cada paso, una función condicionante verifica $v_{n+1}\geq v_+$ y,
+si se cumple, aplica el reseteo~\eqref{eq:reset}. Integramos en
+$t\in[0,200]$\,ms con $h=\num{0.1}$\,ms, partiendo del reposo de cada caso,
+$v(0)=v^*(c)$ y $u(0)=c\,v(0)$ (para $c=\num{0.2}$, $v(0)=\SI{-70}{\milivolt}$).
+
+% =====================================================================
+\section{Resultados}
+% Regla: la leyenda dice QUÉ se grafica; el texto dice QUÉ SE VE; el porqué va en Discusión.
+
+\begin{figure}[t]
+  \centering
+  \figura{f1_base.png}{\columnwidth}
+  \caption{Evolución temporal de $v(t)$ (arriba), $u(t)$ (medio) e $I(t)$
+  (abajo) para $b=\num{0.02}$, $c=\num{0.2}$, $v_-=\SI{-65}{\milivolt}$,
+  $\Delta u=2$ y un escalón $I=10$ desde $t=10$\,ms, integrados con RK4 y
+  $h=\num{0.1}$\,ms. En azul, los spikes igualados a $v_+$.}
+  \label{fig:base}
+\end{figure}
+
+En la Figura~\ref{fig:base} se observa que, mientras $I=0$, la neurona permanece
+en reposo en $\SI{-70}{\milivolt}$. Al encenderse el escalón emite el primer
+spike a los \num{3.5}\,ms; los intervalos entre spikes (ISI) crecen de
+\num{3.6} a \num{15.2}\,ms y desde $t\approx45$\,ms el disparo es periódico
+con ISI $\approx19$\,ms ($\approx53$\,Hz). La variable $u$ salta $\Delta u$
+en cada spike y relaja hacia $c\,v$ entre spikes. % TODO: verificar números
+
+Para reproducir la figura~2 de la Ref.~\cite{izhikevich2003} usamos los
+parámetros de la Tabla~\ref{tab:parametros} y las corrientes
+$I_1$: 10 desde $t=25$; $I_2$: \num{2.5} desde $t=150$;
+$I_3$: $-15$ hasta $t=100$ y 0 después; e
+$I_4$: \num{0.2} desde $t=10$ con un pulso de 10 en $[100,101)$\,ms.
+
+\begin{table}[t]
+  \centering
+  \caption{Parámetros de cada tipo de neurona. En todos los casos
+  $g_2=\num{0.04}$, $g_1=5$, $g_0=140$ y $v_+=\SI{30}{\milivolt}$.}
+  \label{tab:parametros}
+  \small
+  \begin{tabular}{lccccc}
+    \toprule
+    Caso & $b$ & $c$ & $v_-$ [mV] & $\Delta u$ & $I$ \\
+    \midrule
+    RS  & \num{0.02} & \num{0.2}  & $-65$ & 8          & $I_1$ \\
+    IB  & \num{0.02} & \num{0.2}  & $-55$ & 4          & $I_1$ \\
+    CH  & \num{0.02} & \num{0.2}  & $-50$ & 2          & $I_1$ \\
+    FS  & \num{0.1}  & \num{0.2}  & $-65$ & 2          & $I_1$ \\
+    TC1 & \num{0.02} & \num{0.25} & $-65$ & \num{0.05} & $I_2$ \\
+    TC2 & \num{0.02} & \num{0.25} & $-65$ & \num{0.05} & $I_3$ \\
+    RZ  & \num{0.1}  & \num{0.26} & $-65$ & 2          & $I_4$ \\
+    LTS & \num{0.02} & \num{0.25} & $-65$ & 2          & $I_1$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% figure* = figura a doble columna (va arriba de la página siguiente).
+\begin{figure*}[t]
+  \centering
+  \figura{f2_figura2.png}{0.72\textwidth}
+  \caption{Potencial de membrana $v(t)$ (azul) y corriente de entrada $I(t)$
+  (negro, escala arbitraria) para las parametrizaciones RS, IB, CH, FS, TC (dos
+  protocolos), RZ y LTS de la Tabla~\ref{tab:parametros}, integradas con RK4 y
+  $h=\num{0.1}$\,ms desde el reposo de cada caso. Spikes igualados a $v_+$.}
+  \label{fig:tipos}
+\end{figure*}
+
+En la Figura~\ref{fig:tipos} se observa que RS produce un tren de spikes cuyo
+ISI crece de 17 a 45\,ms, mientras que FS dispara a $\approx133$\,Hz sin
+adaptación apreciable. IB emite una ráfaga inicial de tres spikes seguida de
+spikes simples cada 31\,ms, y CH dispara ráfagas de cinco a ocho spikes
+separadas por $\approx60$\,ms. En TC1 un escalón de \num{2.5} alcanza para un
+disparo tónico, mientras que en TC2 la neurona se hiperpolariza hasta
+$\approx\SI{-82}{\milivolt}$ y al liberar la corriente dispara una ráfaga de
+rebote. En RZ el pulso de 1\,ms lleva a la neurona de una oscilación subumbral
+amortiguada a un disparo sostenido, y LTS dispara a alta frecuencia con
+adaptación notoria (ISI de 3 a \num{13.5}\,ms). % TODO: verificar números
+
+\begin{figure}[t]
+  \centering
+  \figura{f6_error.png}{\columnwidth}
+  \caption{Izquierda: máximo error absoluto en los tiempos de disparo de RS en
+  función de $h$, para Euler, RK4 y RK4 con localización del cruce por
+  interpolación lineal. Derecha: $v(t)$ con Euler ($h=\num{0.5}$\,ms) y RK4
+  ($h=\num{0.1}$\,ms); las líneas punteadas marcan los disparos de referencia.}
+  \label{fig:error}
+\end{figure}
+
+La Figura~\ref{fig:error} muestra que el error en los tiempos de disparo de
+RK4 decrece linealmente con $h$, igual que el de Euler pero con una constante
+$\approx\num{2.5}$ veces menor: para $h=\num{0.1}$\,ms es de \num{0.68}\,ms.
+Al localizar el cruce de $v_+$ por interpolación el error baja a
+\num{0.09}\,ms. % TODO
+
+% ---- Segunda parte (opcional). Si no la hacen, borren esta subsección. ----
+\subsection{Red de neuronas acopladas}
+Simulamos una red de $n_e=800$ neuronas excitatorias y $n_i=200$
+inhibitorias con el método de Euler--Maruyama, con la matriz de acoplamiento
+$a_{ij}$ de la consigna. La Figura~\ref{fig:red} compara la activación
+escalón $\Theta(v)$ con la función lineal $z(v)=(87+v)/450-\num{0.0193}$. Con
+$\Theta$ aparecen bandas verticales de disparo sincronizado, como en la
+figura~3 de la Ref.~\cite{izhikevich2003}; con $z(v)$ la tasa media es
+similar ($\num{9.7}$ contra $\num{9.1}$\,Hz) pero las bandas casi desaparecen. % TODO
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}{0.49\textwidth}\centering
+    \figura{f8_red_theta.png}{\linewidth}\caption{Activación $\Theta(v)$}\label{fig:red-theta}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.49\textwidth}\centering
+    \figura{f8_red_z.png}{\linewidth}\caption{Activación $z(v)$}\label{fig:red-z}
+  \end{subfigure}
+  \caption{Arriba: raster de disparos de la red de 1000 neuronas
+  (Euler--Maruyama, $\tau=\num{0.5}$\,ms); las neuronas 1 a 800 son
+  excitatorias y el resto inhibitorias. Abajo: $v(t)$ de la neurona~1. Ambas
+  corridas usan la misma red y la misma semilla de ruido.}
+  \label{fig:red}
+\end{figure*}
+
+% =====================================================================
+\section{Discusión}
+% ¿Se reproducen los tipos? Mecanismos. Fuentes de error. Importancia del modelo.
+Las simulaciones reproducen cualitativamente los ocho tipos de disparo de la
+Ref.~\cite{izhikevich2003}. Las diferencias cuantitativas (cantidad de spikes
+por ráfaga, el mínimo de TC2) se deben a que el paper no especifica las
+corrientes de entrada exactas. Los mecanismos se leen en los parámetros: un
+$\Delta u$ grande produce adaptación (RS); un $v_-$ alto favorece las ráfagas
+(IB, CH); un $b$ grande da recuperación rápida (FS); y un $c$ grande baja el
+umbral (LTS, TC) y da oscilaciones subumbrales (RZ). Los casos de umbral bajo
+son sensibles a la condición inicial: partiendo de $\SI{-70}{\milivolt}$ en lugar
+del reposo aparecen spikes espurios antes del estímulo.
+
+Como fuentes de error numérico destacamos: (i) el reseteo se detecta recién en
+el primer punto de la grilla con $v\geq v_+$, lo que introduce un error
+$\mathcal{O}(h)$ en cada tiempo de disparo, que se acumula de un spike al
+siguiente y anula la ventaja del orden~4 de RK4 (Fig.~\ref{fig:error});
+(ii) la rigidez del término $v^2$ cerca del spike, que con $h$ grande puede
+hacer divergir $v$ dentro de un paso; (iii) el pico muestreado no alcanza
+exactamente $v_+$; y (iv) en sistemas biestables como RZ, un error pequeño
+puede cambiar de régimen la trayectoria.
+
+[Si hacen la parte 2: interpretar por qué $z(v)$ atenúa la sincronización.]
+Finalmente, el modelo de Izhikevich combina la riqueza dinámica de los modelos
+biofísicos con la eficiencia de los modelos de integración y disparo, lo que lo
+hace adecuado para simular redes grandes; la parte~2 muestra que de una red
+sin plasticidad emergen ritmos corticales. % TODO
+
+% =====================================================================
+\section*{Agradecimientos}
+% Opcional.
+Agradecemos a [los docentes de la materia] por [...].
+
+% =====================================================================
+% Referencias "a mano". Alternativa con BibTeX: ver la guía.
+\begin{thebibliography}{9}\small
+\bibitem{izhikevich2003}
+  E.~M. Izhikevich, ``Simple model of spiking neurons,''
+  \emph{IEEE Trans.\ Neural Netw.} \textbf{14}(6), 1569--1572 (2003).
+
+\bibitem{izhikevich2007}
+  E.~M. Izhikevich, \emph{Dynamical Systems in Neuroscience: The Geometry of
+  Excitability and Bursting}, MIT Press (2006).
+
+\bibitem{hodgkin1952}
+  A.~L. Hodgkin y A.~F. Huxley, ``A quantitative description of membrane
+  current and its application to conduction and excitation in nerve,''
+  \emph{J.\ Physiol.} \textbf{117}(4), 500--544 (1952).
+\end{thebibliography}
+
+\end{document}

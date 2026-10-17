@@ -1,0 +1,291 @@
+<title>Temas del informe TP1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: índice de secciones arriba, luego una lista por sección; cada idea lleva su fuente y si ya está en el informe. */
+:root {
+  --paper: #fbfbf9;
+  --ink: #1b1f24;
+  --muted: #5b6168;
+  --rule: #dfe2e4;
+  --accent: #1f62b3;
+  --have-bg: #e3eefb;
+  --have-fg: #1b4f8f;
+  --new-bg: #fbeedd;
+  --new-fg: #8a4a0c;
+  --tip-bg: #f1f4f7;
+  --ded-bg: #e6f3ec;
+  --ded-fg: #1d6a43;
+  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15181c; --ink: #e6e8ea; --muted: #a2a8ae; --rule: #2c3238; --accent: #7fb0ec;
+    --have-bg: #1c2f45; --have-fg: #a9cbf2; --new-bg: #3b2a17; --new-fg: #f2c58f; --tip-bg: #1d2126; --ded-bg: #183427; --ded-fg: #9fdcb9; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15181c; --ink: #e6e8ea; --muted: #a2a8ae; --rule: #2c3238; --accent: #7fb0ec;
+  --have-bg: #1c2f45; --have-fg: #a9cbf2; --new-bg: #3b2a17; --new-fg: #f2c58f; --tip-bg: #1d2126; --ded-bg: #183427; --ded-fg: #9fdcb9; color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: 1.08rem; line-height: 1.55; }
+.wrap { max-width: 46rem; margin: 0 auto; padding-inline: 20px; padding-block: 3rem 4rem; }
+.kicker { font-family: var(--sans); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h1 { font-weight: 600; font-size: clamp(1.8rem, 4.5vw, 2.4rem); line-height: 1.15; margin: .4rem 0 .8rem; text-wrap: balance; }
+.lead { color: var(--muted); max-width: 40rem; }
+.legend { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; font-family: var(--sans); font-size: .85rem; color: var(--muted); margin: 1rem 0 0; align-items: center; }
+nav { font-family: var(--sans); font-size: .9rem; display: flex; flex-wrap: wrap; gap: .4rem; margin: 1.6rem 0 0; padding-top: 1.2rem; border-top: 1px solid var(--rule); }
+nav a { color: var(--ink); text-decoration: none; border: 1px solid var(--rule); border-radius: 999px; padding: .2rem .7rem; }
+nav a:hover, nav a:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+section { margin-top: 2.6rem; }
+h2 { font-family: var(--sans); font-weight: 600; font-size: 1.3rem; margin: 0 0 .3rem; text-wrap: balance; }
+.goal { font-family: var(--sans); font-size: .88rem; color: var(--muted); margin: 0 0 .9rem; }
+ul.ideas { list-style: none; padding: 0; margin: 0; display: grid; gap: .1rem; }
+ul.ideas li { display: grid; grid-template-columns: 6.2rem 1fr; gap: .8rem; padding: .55rem 0; border-bottom: 1px solid var(--rule); }
+ul.ideas li > div { min-width: 0; }
+.tag { font-family: var(--sans); font-size: .7rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border-radius: 3px; padding: .15rem .4rem; height: fit-content; text-align: center; margin-top: .2rem; }
+.have { background: var(--have-bg); color: var(--have-fg); }
+.new { background: var(--new-bg); color: var(--new-fg); }
+.tag.ded, .tag.new.ded { background: var(--ded-bg); color: var(--ded-fg); }
+h3.sub { font-family: var(--sans); font-weight: 600; font-size: .95rem; color: var(--accent); margin: 1.6rem 0 .3rem; }
+.src { font-family: var(--sans); font-size: .78rem; color: var(--muted); margin-left: .3rem; white-space: nowrap; }
+.tip { background: var(--tip-bg); border-radius: 4px; padding: 1rem 1.2rem; margin-top: 2.4rem; }
+.tip h2 { font-size: 1.05rem; }
+.tip ul { margin: .4rem 0 0; padding-left: 1.2rem; }
+.tip li { margin-bottom: .35rem; }
+@media (max-width: 560px) { ul.ideas li { grid-template-columns: 1fr; gap: .3rem; } .tag { justify-self: start; } }
+</style>
+
+<div class="wrap">
+  <div class="kicker">Redes Neuronales 2026 · Trabajo Práctico 1</div>
+  <h1>Temas posibles para cada sección del informe</h1>
+  <p class="lead">Ideas para redactar cada parte, todas sacadas de la consigna, del artículo de Izhikevich, de las notebooks del grupo, de la clase o del borrador .docx. Al lado de cada una figura de dónde sale y si ya aparece en el informe que armamos. Con el límite de 4 páginas no entran todas: sirven para elegir.</p>
+  <div class="legend"><span class="tag have">En el informe</span> ya está en la versión actual <span class="tag new">Idea extra</span> no entró, pero tiene respaldo en las fuentes <span class="tag ded">Deducción</span> cuenta propia con las ecuaciones del paper</div>
+  <nav aria-label="Secciones">
+    <a href="#titulo">Título y autores</a><a href="#resumen">Resumen</a><a href="#intro">Introducción</a><a href="#teoria">Teoría (ampliada)</a><a href="#metodo">Método</a><a href="#red-teoria">Red (teoría)</a><a href="#res1">Resultados: una neurona</a><a href="#res2">Resultados: red</a><a href="#disc">Discusión</a><a href="#cierre">Agradecimientos y referencias</a>
+  </nav>
+
+  <div class="tip">
+    <h2>Lo que pidieron los docentes en la clase</h2>
+    <ul>
+      <li>La leyenda describe el gráfico (“la curva azul representa…”), no el resultado.</li>
+      <li>En Resultados se cuenta lo que se ve; la interpretación va en Discusión.</li>
+      <li>No poner código: poner análisis. Usar el formato a dos columnas y sintetizar, porque hay pocas páginas.</li>
+      <li>Poner los nombres de los autores, porque si no no saben a quién ponerle la nota.</li>
+    </ul>
+  </div>
+
+  <section id="titulo">
+    <h2>Título y autores</h2>
+    <p class="goal">Claro y conciso; nombres completos de todos los autores.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>Usar el ejemplo de la consigna: “Simulación numérica del modelo de neuronas de Izhikevich”.<span class="src">consigna</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Un título que adelante el alcance, por ejemplo mencionando los tipos de disparo y la red de 1000 neuronas.<span class="src">consigna</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Afiliación (FaMAF, UNC) y materia debajo de los nombres.<span class="src">clase</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>El borrador .docx tiene una línea de “Docentes”: se puede sumar si no ocupa espacio.<span class="src">borrador .docx</span></div></li>
+    </ul>
+  </section>
+
+  <section id="resumen">
+    <h2>Resumen</h2>
+    <p class="goal">5 a 10 líneas: objetivo, metodología numérica y resultados principales.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>Qué es el modelo en una oración: dos ecuaciones más una regla de reseteo, rico en patrones y barato de simular.<span class="src">paper</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Método: RK4 con h = 0,1 ms y verificación de v ≥ 30 mV después de cada paso.<span class="src">consigna</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Resultado 1: se reproducen los ocho paneles de la figura 2 (RS, IB, CH, FS, TC1, TC2, RZ, LTS).<span class="src">notebooks</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Resultado 2: el error en los tiempos de disparo de RK4 baja sólo como h por el reseteo.<span class="src">notebook, resultados.json</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Resultado 3: la red da ≈ 7,8 Hz con episodios sincrónicos y quitar las autoconexiones no cambia la dinámica.<span class="src">resultados.json</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Si la segunda parte no se entrega, acortar el resumen a la primera parte.<span class="src">consigna (la segunda parte es opcional)</span></div></li>
+    </ul>
+  </section>
+
+  <section id="intro">
+    <h2>Introducción</h2>
+    <p class="goal">Contexto, qué es un modelo de neurona de disparo, por qué importa Izhikevich, citas y objetivo.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>La modelización como puente entre niveles de comprensión: más detalle no es necesariamente mejor (Dayan y Abbott).<span class="src">borrador .docx</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Qué es una neurona de disparo: describe el potencial de membrana y la generación de potenciales de acción ante una corriente.<span class="src">borrador .docx, consigna</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Integrate-and-fire (Lapicque, 1907): umbral más reseteo, eficiente pero sin variedad de patrones.<span class="src">borrador .docx, paper</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Hodgkin–Huxley (1952): conductancias de Na⁺ y K⁺, detallado pero costoso; sólo un puñado de neuronas en tiempo real.<span class="src">borrador .docx, paper</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>El modelo de Hodgkin y Huxley les valió el Nobel de Fisiología y Medicina de 1963.<span class="src">notebook del grupo</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Izhikevich toma la plausibilidad de Hodgkin–Huxley y la eficiencia del integrate-and-fire; se obtiene por teoría de bifurcaciones y formas normales.<span class="src">paper, consigna</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>La parte v′ = v² + I se conoce como quadratic integrate-and-fire; el modelo se publicó antes en forma trigonométrica, más útil para el análisis.<span class="src">paper</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Escala: el autor simuló 10 000 neuronas con un millón de sinapsis en tiempo real en una PC de 1 GHz.<span class="src">paper</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Relación con la materia: las redes neuronales artificiales también parten de representaciones simplificadas del procesamiento neuronal.<span class="src">borrador .docx</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Objetivo explícito del informe al final de la sección.<span class="src">consigna</span></div></li>
+    </ul>
+  </section>
+
+  <section id="teoria">
+    <h2>Teoría: el modelo, a fondo desde el paper</h2>
+    <p class="goal">Ecuaciones con la notación del artículo, significado de v, u, I, a, b, c, d, y la aclaración sobre los 30 mV. Las referencias entre paréntesis indican dónde está cada cosa en el artículo de Izhikevich (2003). Las marcadas como “Deducción” no las dice el paper: salen de hacer la cuenta con sus ecuaciones, y conviene presentarlas como cálculo propio.</p>
+
+    <h3 class="sub">De dónde sale el modelo</h3>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>El problema que resuelve: un modelo de neurona tiene que ser a la vez computacionalmente simple y capaz de producir patrones de disparo ricos, dos requisitos que parecen excluirse.<span class="src">paper, Introducción</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>La motivación declarada: entender el cerebro requiere combinar experimentos con simulaciones de modelos de gran escala hechos de neuronas que disparan.<span class="src">paper, Introducción</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Las técnicas de bifurcación permiten reducir muchos modelos de tipo Hodgkin–Huxley a un sistema de dos ecuaciones diferenciales ordinarias de la forma (1)–(2).<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>La parte v′ = v² + I se conoce como neurona “quadratic integrate-and-fire”; el modelo completo se había publicado antes en forma trigonométrica, más apta para el análisis matemático, y esta forma polinomial es más apta para simulaciones grandes.<span class="src">paper, Introducción</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>El modelo es “canónico”: la diferencia entre él y toda una clase de modelos de tipo Hodgkin–Huxley, incluso con un número enorme de ecuaciones, es sólo un cambio de coordenadas.<span class="src">paper, Conclusión</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Es el modelo más simple capaz de esos comportamientos: dos ecuaciones y un único término no lineal, v².<span class="src">paper, Conclusión</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>La figura 1 del paper muestra que el modelo reproduce registros reales de neuronas de la corteza motora de rata, con los parámetros de la figura 2.<span class="src">paper, Fig. 1</span></div></li>
+    </ul>
+
+    <h3 class="sub">Ecuaciones, unidades y la función 0,04v² + 5v + 140</h3>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>Las ecuaciones (1)–(2) y el reseteo (3), escritas tal como en el paper.<span class="src">paper, sección II; consigna</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Un detalle fino: el paper dice que v, u, a, b, c y d son adimensionales, pero que el término 0,04v² + 5v + 140 se ajustó para que v quede en escala de mV y t en ms. Por eso se habla de mV y ms.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Ese polinomio se obtuvo ajustando la dinámica de iniciación del spike de una neurona cortical, y el autor aclara que otras elecciones también son posibles.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>La elección 0,04v² + 5v + 140 es “una para todos” y se justifica para redes grandes. Para estudiar una sola neurona hay alternativas: con 0,04v² + 4,1v + 108 y b = −0,1, la RS pasa a tener una bifurcación silla-nodo sobre un ciclo invariante y excitabilidad de clase 1.<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag ded">Deducción</span><div>Por el término v², una vez que v se dispara crece cada vez más rápido y, sin reseteo, divergiría en tiempo finito. Por eso el modelo necesita la regla (3) y por eso hace falta un valor de corte como 30 mV.<span class="src">cuenta con la Ec. (1)</span></div></li>
+    </ul>
+
+    <h3 class="sub">Las variables v, u e I</h3>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>v es el potencial de membrana; u es una variable de recuperación de la membrana que representa la activación de corrientes de K⁺ y la inactivación de corrientes de Na⁺, y realimenta negativamente a v.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Por I entran tanto corrientes sinápticas como corrientes continuas inyectadas.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Extensión que propone el paper: tomar u, a y b como vectores para representar conductancias lentas con varias escalas de tiempo. El autor la considera innecesaria para neuronas corticales.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag ded">Deducción</span><div>Lectura geométrica: la nulclina de v es la parábola u = 0,04v² + 5v + 140 + I y la de u es la recta u = bv. El reposo está donde se cortan, y aumentar I sube la parábola hasta que dejan de cortarse.<span class="src">cuenta con (1)–(2); notebook, plano de fase</span></div></li>
+    </ul>
+
+    <h3 class="sub">Los cuatro parámetros, uno por uno</h3>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div><b>a</b>: escala temporal de u; cuanto más chico, más lenta la recuperación. Valor típico 0,02.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag ded">Deducción</span><div>1/a da el tiempo característico de u: unos 50 ms con a = 0,02 y unos 10 ms con a = 0,1 (FS y RZ).<span class="src">cuenta con la Ec. (2)</span></div></li>
+      <li><span class="tag have">En el informe</span><div><b>b</b>: sensibilidad de u a las fluctuaciones subumbrales de v. Valor típico 0,2.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Un b mayor acopla más fuerte v y u y puede dar oscilaciones subumbrales y disparo de bajo umbral. Esto conecta con LTS, TC (b = 0,25) y RZ (b = 0,26).<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div><b>c</b>: valor de reseteo de v después del spike, causado por las conductancias rápidas de K⁺ de alto umbral. Valor típico −65 mV.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div><b>d</b>: salto de u después del spike, causado por las conductancias lentas de Na⁺ y K⁺ de alto umbral. Valor típico 2.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Agrupar los parámetros como lo hace la figura 2 del paper: (a, b) gobiernan la dinámica de u y (c, d), el reseteo. La notebook del grupo tiene un gráfico con los ocho casos en esos dos planos.<span class="src">paper, Fig. 2; notebook del grupo</span></div></li>
+    </ul>
+
+    <h3 class="sub">Umbral, reposo y reseteo</h3>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>+30 mV es el ápice del spike; ahí se aplica el reseteo. No es un umbral fisiológico.<span class="src">paper, sección II; consigna</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Como la mayoría de las neuronas reales, el modelo no tiene un umbral fijo: según la historia del potencial antes del spike, el umbral va de −55 a −40 mV.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>El potencial de reposo queda entre −70 y −60 mV según b.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag ded">Deducción</span><div>Reposo y “umbral” para I = 0 son las dos raíces de 0,04v² + (5 − b)v + 140 = 0: con b = 0,2, reposo en −70 mV y silla en −50 mV; con b = 0,25, −64,4 y −54,3 mV; con b = 0,26, −62,5 y −56,0 mV. Los reposos caen dentro del rango de −70 a −60 mV que da el paper, y las sillas (−50, −54,3 y −56 mV) quedan en el extremo bajo del rango de umbrales de −55 a −40 mV o apenas por debajo.<span class="src">cuenta con (1)–(2)</span></div></li>
+      <li><span class="tag ded">Deducción</span><div>Esto explica las condiciones iniciales de la consigna: v(0) = −70 mV con u(0) = −14 es exactamente el reposo del caso base, y v(0) = −62,5 mV es el reposo de RZ. En cambio, con v(0) = −65 mV y b = 0,2 la neurona no arranca en reposo y baja hacia −70 mV antes del estímulo, como se ve en los paneles RS, IB, CH y FS.<span class="src">cuenta; notebook (derivadas nulas en t = 0)</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>En la figura 3 del paper todos los spikes se igualan a 30 mV llevando v primero a 30 y después a c. Es el mismo criterio que usamos para dibujar el pico.<span class="src">paper, leyenda de Fig. 3</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>La figura 2 del paper usa resolución temporal de 0,1 ms, el mismo paso h que pide la consigna.<span class="src">paper, leyenda de Fig. 2</span></div></li>
+    </ul>
+
+    <h3 class="sub">Bifurcaciones y estabilidad del reposo</h3>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>b &lt; a corresponde a una bifurcación silla-nodo del reposo y b &gt; a, a una de Andronov–Hopf.<span class="src">paper, sección II</span></div></li>
+      <li><span class="tag ded">Deducción</span><div>El jacobiano en el reposo es J = [[0,08v* + 5, −1], [ab, −a]]. Con traza y determinante se clasifica el reposo: hay Hopf cuando la traza 0,08v* + 5 − a se anula con determinante positivo. Para RS da I ≈ 3,8 (Hopf), antes de la silla-nodo en I = 4.<span class="src">notebook, análisis extra 1</span></div></li>
+      <li><span class="tag ded">Deducción</span><div>Autovalores en el reposo con I = 0: en RS y FS son reales y negativos (nodo, sin oscilación), mientras que en RZ son complejos (foco), con período ≈ 41 ms. Con I = 0,2, el período de RZ es ≈ 46 ms y la amplitud decae con tiempo característico ≈ 70 ms.<span class="src">cuenta con el jacobiano</span></div></li>
+      <li><span class="tag ded">Deducción</span><div>Ese período de ≈ 46 ms es compatible con la separación de ≈ 50 ms entre las dos ventanas en las que el pulso de RZ no dispara ([73, 85] y [123, 130] ms). Sirve para justificar la resonancia con una cuenta.<span class="src">cuenta + notebook (barrido de RZ)</span></div></li>
+    </ul>
+
+    <h3 class="sub">Los tipos neuronales como mapa de parámetros</h3>
+    <ul class="ideas">
+      <li><span class="tag new">Idea extra</span><div>Las neuronas neocorticales se clasifican por el patrón de disparo en registros intracelulares; el paper cita la clasificación de Connors y Gutnick (1990), Gray y McCormick (1996) y Gibson y colaboradores (1999).<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>RS, IB y CH son excitatorias corticales; FS y LTS, interneuronas inhibitorias; TC son tálamo-corticales, la principal entrada a la corteza.<span class="src">paper, Fig. 2 y sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>RS es el tipo más común en la corteza. Más corriente aumenta su frecuencia, pero nunca se vuelve muy rápida por las grandes hiperpolarizaciones posteriores al spike (c = −65 profundo, d = 8 grande).<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>IB: c = −55 (reseteo alto) y d = 4. Durante la ráfaga inicial u se acumula y termina pasando la dinámica de ráfaga a spikes simples.<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>CH: c = −50 (reseteo muy alto) y d = 2; la frecuencia entre ráfagas puede llegar a 40 Hz.<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>FS: a = 0,1, recuperación rápida, trenes periódicos de frecuencia muy alta prácticamente sin adaptación.<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>LTS: alta frecuencia con adaptación notoria y umbral bajo (b = 0,25). El autor advierte que, para ajustar cuantitativamente LTS reales, habría que cambiar otros parámetros también.<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>TC tiene dos regímenes: disparo tónico si se despolariza desde el reposo (v ≈ −60 mV) y ráfaga de rebote si antes se hiperpolariza (v ≈ −90 mV).<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>RZ (a = 0,1, b = 0,26): oscilaciones subumbrales amortiguadas o sostenidas, resonancia ante entradas rítmicas de frecuencia adecuada (como el modelo resonate-and-fire) y biestabilidad entre reposo y disparo repetitivo, que se conmuta con estímulos breves bien sincronizados.<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Según el autor, el modelo también describe neuronas del tronco encefálico, hipocampo, ganglios basales y bulbo olfatorio.<span class="src">paper, sección III</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>La lista completa de comportamientos que el paper dice reproducir: spiking, bursting, modos mixtos, spikes y ráfagas de rebote, adaptación de frecuencia, umbral variable, biestabilidad, y oscilaciones subumbrales con resonancia.<span class="src">paper, Conclusión</span></div></li>
+    </ul>
+
+    <h3 class="sub">Apoyo visual que ya existe</h3>
+    <ul class="ideas">
+      <li><span class="tag new">Idea extra</span><div>En el proyecto hay figuras de teoría ya hechas: anatomía de un spike, la parábola de v, el efecto de cada parámetro y el plano de fase (carpeta figs/teoria, t1 a t8). Alguna puede servir como figura de la sección Teoría si sobra lugar.<span class="src">proyecto, figuras_teoria.py</span></div></li>
+    </ul>
+  </section>
+
+  <section id="metodo">
+    <h2>Teoría: método numérico</h2>
+    <p class="goal">Cómo se integró y cómo se trató el reseteo.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>Fórmulas de RK4 (k₁ a k₄) con h = 0,1 ms.<span class="src">consigna, notebooks</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Reseteo aplicado después de cada paso, como “función condicionante” del integrador.<span class="src">consigna, notebook del grupo</span></div></li>
+      <li><span class="tag have">En el informe</span><div>El pico se inserta en 30 mV sólo para graficar, porque el valor guardado en ese paso ya es c.<span class="src">notebook del grupo</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Sin insertar el pico, el máximo de v guardado en el caso base es 19,6 mV: ejemplo concreto de por qué hace falta dibujarlo.<span class="src">resultados.json</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Las corrientes se implementan como funciones de t que se pasan en los parámetros (un if por tramo).<span class="src">clase, notebook del grupo</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Las condiciones iniciales importan: con otras v(0) algunos casos no salen; la clase lo marcó como fuente de dolores de cabeza.<span class="src">clase</span></div></li>
+    </ul>
+  </section>
+
+  <section id="red-teoria">
+    <h2>Teoría: red de 1000 neuronas (opcional)</h2>
+    <p class="goal">Sólo si entregan la segunda parte.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>800 excitatorias y 200 inhibitorias (4:1), parámetros con rᵢ²: de RS a CH y de LTS a FS.<span class="src">consigna, paper</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Matriz S = [0,5 R_E | −R_I], ruido talámico 5ξ y 2ξ, acoplamiento por pulsos y dos medios pasos de Euler.<span class="src">consigna, paper</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Es una red de pulsos acoplados (PCNN): el disparo de j cambia vᵢ en sᵢⱼ instantáneamente. Las inhibitorias se hacen más fuertes a propósito.<span class="src">paper</span></div></li>
+      <li><span class="tag have">En el informe</span><div>La diagonal de S no se anula: hay autoconexiones. No confundir con la red dispersa de 10 000 neuronas.<span class="src">consigna</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Euler–Maruyama y por qué aparece √h (varianza del incremento de Wiener), y por qué no va en el Matlab literal.<span class="src">consigna, notebook</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Cómo se usa z(v): Iᵢ = Σⱼ sᵢⱼ z(vⱼ), continua; no es un detector de spikes y es otro modelo.<span class="src">consigna, notebook</span></div></li>
+    </ul>
+  </section>
+
+  <section id="res1">
+    <h2>Resultados: una neurona</h2>
+    <p class="goal">Figuras con leyenda, cada una citada en el texto, describiendo lo que se ve.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>Caso base: reposo en −70 mV, estímulo en t = 10 ms, siete spikes, ISI de 3,6 a ≈ 19 ms, saltos de u.<span class="src">notebooks</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Tabla de parámetros, corriente, v(0) y número de spikes de cada caso.<span class="src">consigna, notebooks</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Descripción de cada uno de los ocho paneles con sus números (ráfagas, ISI, hiperpolarización de TC2, oscilación de RZ).<span class="src">notebooks</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Los casos ubicados en los planos (a, b) y (c, d), como en la figura 2 del paper.<span class="src">notebook del grupo</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>u(t) en los ocho casos: cómo se acumula en las ráfagas de IB y CH.<span class="src">notebook</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Plano de fase con nulclinas para RS y CH.<span class="src">notebook</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Curva frecuencia–corriente: con I = 2 sólo LTS dispara (20 Hz); con I = 20, FS llega a 314 Hz y RS a 44 Hz.<span class="src">resultados.json</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Barrido del instante del pulso en RZ: no dispara si llega en [73, 85] o [123, 130] ms.<span class="src">notebook</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Error en los tiempos de disparo contra h para Euler, RK4 y RK4 con interpolación del cruce.<span class="src">notebook, resultados.json</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Observación de la clase: un mismo valor de u no decide sólo si dispara, también importa v.<span class="src">clase</span></div></li>
+    </ul>
+  </section>
+
+  <section id="res2">
+    <h2>Resultados: red (opcional)</h2>
+    <p class="goal">Raster con semilla reportada y comparación con y sin diagonal.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>Raster de 1000 ms con semilla 2026: fondo asincrónico y bandas en ≈ 40, 160, 290 y 410 ms.<span class="src">resultados, notebook</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Número de spikes y tasas: 7765 spikes, 7,77 Hz con diagonal; 7561, 7,56 Hz sin diagonal.<span class="src">resultados.json</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Veinte semillas: diferencia de tasa 0,02 ± 0,12 Hz.<span class="src">resultados.json</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Espectro de la tasa poblacional con máximo en ≈ 7,8 Hz, como figura propia.<span class="src">notebook</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Tasas por población: excitatorias 7,82 Hz e inhibitorias 7,57 Hz, y lo mismo sin el transitorio (t &gt; 100 ms).<span class="src">resultados.json</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Euler–Maruyama (episodio inicial y luego 8,23 Hz) y z(v) (8,34 Hz).<span class="src">resultados.json</span></div></li>
+    </ul>
+  </section>
+
+  <section id="disc">
+    <h2>Discusión</h2>
+    <p class="goal">Si se reproducen los tipos de dinámica, fuentes de error, importancia del paso h y del reseteo.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>Cada tipo comparado con la descripción del paper y el parámetro que lo distingue (d = 8 en RS, c alto en IB y CH, a = 0,1 en FS, b = 0,25 en LTS y TC).<span class="src">paper</span></div></li>
+      <li><span class="tag have">En el informe</span><div>FS contra LTS: ambas rápidas, pero sólo LTS se adapta.<span class="src">paper</span></div></li>
+      <li><span class="tag have">En el informe</span><div>TC: dos regímenes; la hiperpolarización de ≈ −87 mV, cerca de los ≈ −90 mV del paper.<span class="src">paper, notebook</span></div></li>
+      <li><span class="tag have">En el informe</span><div>RZ: oscilaciones amortiguadas y biestabilidad entre reposo y disparo; el pulso funciona según su fase.<span class="src">paper, notebook</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>En RZ la corriente antes y después del pulso es la misma y sin embargo un lado dispara y el otro no: cambió el estado interno.<span class="src">clase</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Por qué no coinciden los números con el paper: las corrientes no están tabuladas y algunos casos dependen de v(0).<span class="src">consigna, clase</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Reseteo al final del paso: error O(h) que se arrastra, por eso RK4 sólo mejora la constante.<span class="src">notebook</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Otras fuentes: rigidez del término v² cerca del pico y sensibilidad cerca de una bifurcación.<span class="src">notebook</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Red: ≈ 8 Hz y episodios sincrónicos como en el paper, con el pico en 7,8 Hz cerca de la banda α (10 Hz).<span class="src">paper, resultados.json</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Mecanismo de las bandas: unas excitatorias disparan, arrastran a otras en cascada, después quedan “cansadas” y el ruido vuelve a encender la actividad.<span class="src">clase</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>El paper también menciona episodios en la banda γ (40 Hz) y que, cambiando pesos y ruido, aparecen ondas de husos y oscilaciones de sueño.<span class="src">paper</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Las autoconexiones son un peso frente a cientos de entradas: no cambian la dinámica.<span class="src">resultados.json</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Límites del estudio: red densa de 1000 neuronas y no la dispersa de 10 000, sin plasticidad sináptica, resolución de 1 ms.<span class="src">paper, consigna</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Un párrafo final de conclusiones que sintetice qué se reproduce bien y qué no.<span class="src">clase</span></div></li>
+    </ul>
+  </section>
+
+  <section id="cierre">
+    <h2>Agradecimientos y referencias</h2>
+    <p class="goal">Agradecimientos opcionales; citas en la introducción y donde corresponda.</p>
+    <ul class="ideas">
+      <li><span class="tag have">En el informe</span><div>Agradecer a los docentes de la materia.<span class="src">consigna</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Agradecer a compañeros con los que se discutió el trabajo.<span class="src">consigna</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Las tres referencias de la consigna: Izhikevich 2003, Izhikevich 2007 y Hodgkin–Huxley 1952.<span class="src">consigna</span></div></li>
+      <li><span class="tag have">En el informe</span><div>Dayan y Abbott 2001 y Lapicque 1907, que ya citaban en el borrador.<span class="src">borrador .docx</span></div></li>
+      <li><span class="tag new">Idea extra</span><div>Citar la Guía 6 de prácticos, que la consigna pide usar como referencia.<span class="src">consigna</span></div></li>
+    </ul>
+  </section>
+</div>
