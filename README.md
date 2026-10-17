@@ -8,28 +8,26 @@ Trabajo Práctico 1 del curso *Redes Neuronales 2026* — FaMAF, Universidad Nac
 
 ## El modelo
 
-El modelo reduce la dinámica de Hodgkin-Huxley a dos ecuaciones:
+El modelo reduce la dinámica de Hodgkin-Huxley a dos ecuaciones (notación del informe y del código, la misma que el paper):
 
 ```
-dv/dt = g2·v² + g1·v + g0 − u + I(t)
-du/dt = b·(c·v − u)
+dv/dt = 0.04·v² + 5·v + 140 − u + I(t)
+du/dt = a·(b·v − u)
 
-si v ≥ v+  →  v ← v−,   u ← u + Δu
+si v ≥ 30 mV  →  v ← c,   u ← u + d
 ```
 
 | Símbolo | Qué representa |
 |---|---|
 | `v` | Potencial de membrana (mV) |
 | `u` | Variable de recuperación (activación de K⁺ / inactivación de Na⁺) |
-| `b` | Velocidad de recuperación de `u` |
-| `c` | Sensibilidad de `u` a las fluctuaciones de `v` |
-| `v−` | Valor de reseteo de `v` después de un disparo |
-| `Δu` | Incremento de `u` después de un disparo |
 | `I(t)` | Corriente de entrada externa |
+| `a` | Escala temporal de `u` (velocidad de recuperación) |
+| `b` | Sensibilidad de `u` a las fluctuaciones subumbrales de `v` |
+| `c` | Valor de reseteo de `v` después de un disparo (mV) |
+| `d` | Incremento de `u` después de un disparo |
 
-Parámetros base: `g2 = 0.04`, `g1 = 5`, `g0 = 140`, `v+ = 30 mV`.
-
-> Nota: la notación `b, c, v−, Δu`, corresponde a `a, b, c, d` del paper original.
+> Nota: la consigna anterior (24/9) usaba `b, c, v−, Δu` en lugar de `a, b, c, d`. Esa notación sólo aparece en `versiones-previas/` y en `simulaciones/codigo/figuras_teoria.py`.
 
 ---
 
@@ -37,20 +35,23 @@ Parámetros base: `g2 = 0.04`, `g1 = 5`, `g0 = 140`, `v+ = 30 mV`.
 
 ### Parte 1 — Neurona individual
 
-1. Integración con RK4 en `t ∈ [0, 200]` ms, paso `h = 0.1`, con `v(0) = −70` y `u(0) = c·v(0)`.
-2. Corriente escalón: `I = 0` si `t < 10`, `I = 10` si `t ≥ 10`.
-3. Reproducción de los 8 patrones de disparo de la Figura 2 del paper:
+1. Integración con RK4, paso `h = 0.1` ms, reseteo cuando `v ≥ 30` mV y condición inicial `u(0) = b·v(0)`.
+2. Caso base en `t ∈ [0, 100]` ms con `v(0) = −70` mV (`u(0) = −14`) y escalón `I₀`: `I = 0` si `t < 10`, `I = 10` si `t ≥ 10`.
+3. Reproducción de los 8 patrones de disparo de la Figura 2 del paper, simulados durante 200 ms (300 ms para RZ):
 
-| Caso | Nombre | b | c | v− | Δu |
-|---|---|---|---|---|---|
-| RS | Regular spiking | 0.02 | 0.2 | −65 | 8 |
-| IB | Intrinsically bursting | 0.02 | 0.2 | −55 | 4 |
-| CH | Chattering | 0.02 | 0.2 | −50 | 2 |
-| FS | Fast spiking | 0.1 | 0.2 | −65 | 2 |
-| TC1 | Thalamo-cortical (despolarizado) | 0.02 | 0.25 | −65 | 0.05 |
-| TC2 | Thalamo-cortical (hiperpolarizado) | 0.02 | 0.25 | −65 | 0.05 |
-| RZ | Resonator | 0.1 | 0.26 | −65 | 2 |
-| LTS | Low-threshold spiking | 0.02 | 0.25 | −65 | 2 |
+| Caso | Nombre | a | b | c (mV) | d | v(0) (mV) | Corriente (t en ms) |
+|---|---|---|---|---|---|---|---|
+| Base | Caso base | 0.02 | 0.2 | −65 | 2 | −70 | `I₀`: 0 (t < 10); 10 (t ≥ 10) |
+| RS | Regular spiking | 0.02 | 0.2 | −65 | 8 | −65 | `I₁`: 0 (t < 20); 10 (t ≥ 20) |
+| IB | Intrinsically bursting | 0.02 | 0.2 | −55 | 4 | −65 | `I₁` |
+| CH | Chattering | 0.02 | 0.2 | −50 | 2 | −65 | `I₁` |
+| FS | Fast spiking | 0.1 | 0.2 | −65 | 2 | −65 | `I₁` |
+| TC1 | Thalamo-cortical (despolarizado) | 0.02 | 0.25 | −65 | 0.05 | −63 | `I₂`: 0 (t < 20); 1 (t ≥ 20) |
+| TC2 | Thalamo-cortical (hiperpolarizado) | 0.02 | 0.25 | −65 | 0.05 | −65 | `I₃`: 0 (t < 20); −25 (20 ≤ t < 80); 0 (t ≥ 80) |
+| RZ | Resonator | 0.1 | 0.26 | −65 | 2 | −62.5 | `I₄`: 0 (t < 40); 0.2 (40 ≤ t < 180); 2.2 (180 ≤ t < 181); 0.2 (t ≥ 181) |
+| LTS | Low-threshold spiking | 0.02 | 0.25 | −65 | 2 | −65 | `I₁` |
+
+4. Error numérico: el caso base se repite con `h = 0.2, 0.05, 0.01` ms, tomando `h = 0.01` como referencia.
 
 ### Parte 2 — Red de neuronas
 
