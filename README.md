@@ -65,8 +65,6 @@ Parámetros base: `g2 = 0.04`, `g1 = 5`, `g0 = 140`, `v+ = 30 mV`.
 
 ## Estructura del repositorio
 
-Autores (grupo 36): Mariel Anachuri, Camila Giolitto, Martín Robins.
-
 ```
 Neurona-Izhikevich/
 ├── README.md
